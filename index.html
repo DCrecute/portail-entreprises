@@ -143,7 +143,7 @@ async function ouvrir(code) {
   const np = BLOBS[k.tag];
   if (!np) throw new Error("code");
   let blob = "";
-  for (let i = 0; i < np; i++) { const rr = await fetch("blobs/" + k.tag + "." + i + ".txt"); if (!rr.ok) throw new Error("reseau"); blob += await rr.text(); }
+  for (let i = 0; i < np; i++) { const rr = await fetch("blobs/" + k.tag + "." + i + ".txt"); if (!rr.ok) throw new Error("reseau"); blob += (await rr.text()).slice(1); }
   const raw = b64(blob);
   const key = await crypto.subtle.importKey("raw", k.aes, "AES-GCM", false, ["decrypt"]);
   const clair = await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, key, raw.slice(12));
