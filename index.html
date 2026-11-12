@@ -142,9 +142,8 @@ async function restaurer() {
     const raw = new Uint8Array(await r.arrayBuffer());
     const ev = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, AESK, raw.slice(12))));
     ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
-    const dec = {}, top = {}, aj = new Map();
-    ev.forEach(e => { if (e.action === "ajout" && e.candidat_data) aj.set(e.offre + "|" + e.candidat, e.candidat_data); if (e.action === "ajout_retire") aj.delete(e.offre + "|" + e.candidat); });
-    aj.forEach((c, k) => { const o = D.offres.find(x => x.id === k.split("|")[0]); if (o && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({manuel: true}, c)); });
+    const dec = {}, top = {};
+    ev.forEach(e => { if (e.action === "ajout" && e.candidat_data) { const o = D.offres.find(x => x.id === e.offre); if (o && !o.candidats.some(x => x.id === e.candidat_data.id)) o.candidats.push(Object.assign({manuel: true}, e.candidat_data)); } else if (e.action === "ajout_retire") { const o = D.offres.find(x => x.id === e.offre); if (o) o.candidats = o.candidats.filter(x => x.id !== e.candidat); } });
     ev.forEach(e => { const k = e.offre + "|" + e.candidat;
       if (e.action === "decision") { if (e.decision === "annulee") delete dec[k]; else dec[k] = Object.assign(dec[k] || {plan: {}}, {d: e.decision, motif: e.motif, quand: e.quand}); }
       else if (e.action === "email" && dec[k]) dec[k].entretien = {mode: e.mode, quand: e.quand, objet: e.objet};
@@ -391,8 +390,9 @@ async function chargerJournal() {
     try { const r = await fetch(CONFIG.endpoint + "?action=journal&cle=" + encodeURIComponent(CLE)); ev = ev.concat(await r.json()); } catch (_) { $("#contenu-eq").innerHTML = '<div class="vide">Le journal n\'a pas pu être chargé. Réessayez dans un instant.</div>'; }
   }
   EV = ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
-  if (CONFIG.tally) { const aj = new Map(); EV.forEach(e => { if (e.action === "ajout") aj.set(e.entreprise + "|" + e.offre + "|" + e.candidat, 1); if (e.action === "ajout_retire") aj.delete(e.entreprise + "|" + e.offre + "|" + e.candidat); });
-    aj.forEach((_, k) => { const [ei, oi, ci] = k.split("|"), e = D.entreprises.find(x => x.id === ei), o = e && e.offres.find(x => x.id === oi), c = poolCand().find(x => x.id === ci); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false})); }); }
+  if (CONFIG.tally) EV.forEach(e => { const en = D.entreprises.find(x => x.id === e.entreprise), o = en && en.offres.find(x => x.id === e.offre); if (!o) return;
+    if (e.action === "ajout") { const c = poolCand().find(x => x.id === e.candidat); if (c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false})); }
+    else if (e.action === "ajout_retire") o.candidats = o.candidats.filter(x => x.id !== e.candidat); });
 }
 function etatEquipe() {
   const dec = {}, mail = {}, top = {};
@@ -433,9 +433,9 @@ function rendreEquipe() {
         <td>${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') + `<div class="meta">${FR(l.d.quand)}</div>` + (l.d.motif ? `<div class="meta"><b>Motif :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">À traiter</span>'}</td>
         <td>${l.m ? `<span class="pastille v">${esc(LIB[l.m.mode] || l.m.mode)}</span><div class="meta">${FR(l.m.quand)}</div>` + (l.m.planification && l.m.planification.nom ? `<div class="meta">${esc(l.m.planification.nom)}${l.m.planification.fonction ? ", " + esc(l.m.planification.fonction) : ""}</div>` : "") : '<span class="meta">—</span>'}</td>
         <td>${l.rang ? `<span class="pastille v">N° ${l.rang}</span>` : '<span class="meta">—</span>'}</td>
-        <td><button data-fiche="${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}">Voir le dossier</button>${l.c.manuel ? ` <button class="ko" data-retirer-aj="${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}" title="Retirer cet ajout manuel">Retirer</button>` : ""}</td></tr>`).join("")}</table>`).join("")).join("");
+        <td><button data-fiche="${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}">Voir le dossier</button> <button class=\"ko\" data-retirer-aj=\"${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}\" title=\"Retirer ce candidat de cette offre\">Retirer</button></td></tr>`).join("")}</table>`).join("")).join("");
   document.querySelectorAll("[data-ajout]").forEach(b => b.onclick = () => { const [ei, oi] = b.dataset.ajout.split("|"); ajouterManuel(D.entreprises.find(x => x.id === ei), oi); });
-  document.querySelectorAll("[data-retirer-aj]").forEach(b => b.onclick = () => { const [ei, oi, ci] = b.dataset.retirerAj.split("|"); const L = lireAjouts().filter(a => !(a.entreprise === ei && a.offre === oi && a.candidat === ci)); localStorage.setItem("dc-ajouts", JSON.stringify(L)); const e = D.entreprises.find(x => x.id === ei), o = e.offres.find(x => x.id === oi); o.candidats = o.candidats.filter(x => x.id !== ci); envoyer("ajout_retire", {entreprise: ei, offre: oi, candidat: ci}); rendreEquipe(); });
+  document.querySelectorAll("[data-retirer-aj]").forEach(b => b.onclick = () => { const [ei, oi, ci] = b.dataset.retirerAj.split("|"); if (!confirm("Retirer ce candidat de cette offre ? Il ne sera plus visible par l'entreprise.")) return; const L = lireAjouts().filter(a => !(a.entreprise === ei && a.offre === oi && a.candidat === ci)); localStorage.setItem("dc-ajouts", JSON.stringify(L)); const e = D.entreprises.find(x => x.id === ei), o = e.offres.find(x => x.id === oi); o.candidats = o.candidats.filter(x => x.id !== ci); envoyer("ajout_retire", {entreprise: ei, offre: oi, candidat: ci}); rendreEquipe(); });
   $("#f-ent").onchange = ev => { FILTRE_EQ = ev.target.value; rendreEquipe(); };
   $("#csv").onclick = () => exporterCsv(lignes);
   document.querySelectorAll("[data-fiche]").forEach(b => b.onclick = () => { const [ei, oi, ci] = b.dataset.fiche.split("|"); const e = D.entreprises.find(x => x.id === ei), o = e.offres.find(x => x.id === oi); ficheEquipe(o.candidats.find(x => x.id === ci), e, o); });
