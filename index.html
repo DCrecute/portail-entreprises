@@ -274,7 +274,9 @@ function dossierHtml(c, direct) {
     <div class="cvv">${p ? `<iframe title="CV de ${esc(c.prenom)} ${esc(c.nom)}" ${direct ? `src="${src}"` : `data-src="${src}"`} loading="lazy"></iframe><div class="meta" style="margin-top:6px">Aperçu non affiché ? <a href="${esc(c.cv)}" target="_blank" rel="noopener">Ouvrir le CV dans un nouvel onglet</a></div>` : `<div class="nocv">${c.cv ? `Aperçu indisponible pour ce format.<br><a class="btn" style="margin-top:10px" href="${esc(c.cv)}" target="_blank" rel="noopener">Ouvrir le CV</a>` : "CV non fourni"}</div>`}</div></div>`;
 }
 const genreCls = g => /^f/i.test(g || "") ? "f" : /^(h|m)/i.test(g || "") ? "h" : "n";
-const badges = c => (c.reserve ? '<span class="badge" style="background:#FFF1D6;color:#8A5A00">Avec réserve</span>' : "") + (c.manuel ? '<span class="badge manuel">Ajout manuel</span>' : "") + (c.genre ? `<span class="badge ${genreCls(c.genre)}">${esc(c.genre)}</span>` : "") + `<span class="badge n">Dossier n° ${esc(c.id)}</span>` + (c.score !== undefined && c.score !== "" ? `<span class="badge s" title="Score de pré-tri de la fiche, sur 100">Fiche : ${esc(c.score)}/100</span>` : "");
+const noteMoy = c => { const v = Object.values(c.notes || {}).map(Number).filter(x => x > 0); return v.length ? (v.reduce((a, b) => a + b, 0) / v.length) : null; };
+const noteTxt = c => { const m = noteMoy(c); return m === null ? "" : (Math.round(m * 10) / 10).toString().replace(".", ","); };
+const badges = c => (c.reserve ? '<span class="badge" style="background:#FFF1D6;color:#8A5A00">Avec réserve</span>' : "") + (c.manuel ? '<span class="badge manuel">Ajout manuel</span>' : "") + (c.genre ? `<span class="badge ${genreCls(c.genre)}">${esc(c.genre)}</span>` : "") + `<span class="badge n">Dossier n° ${esc(c.id)}</span>` + (noteTxt(c) ? `<span class="badge s" title="Moyenne des cinq notes de l'entretien de découverte, sur 5">Note : ${noteTxt(c)}/5</span>` : `<span class="badge s" title="Pas d'entretien de découverte à ce jour">Non évalué</span>`);
 const LIB = {candidat: "lien de réservation du candidat", recruteur: "votre lien de réservation", manuel: "disponibilités à communiquer"};
 
 function planif(o, c) {
@@ -475,7 +477,7 @@ function journalHtml(L) {
 }
 function exporterCsv(lignes) {
   const S = etatEquipe(), q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-  const rows = [["Entreprise", "Offre", "Dossier", "Candidat", "Genre", "Score", "Décision", "Motif", "Entretien", "Top 3"]].concat(lignes.map(l => [l.e.nom, l.o.poste, l.c.id, l.c.prenom + " " + l.c.nom, l.c.genre, l.c.score, l.d ? l.d.decision : "à traiter", l.d ? l.d.motif : "", l.m ? LIB[l.m.mode] : "", l.rang || ""]));
+  const rows = [["Entreprise", "Offre", "Dossier", "Candidat", "Genre", "Note /5", "Décision", "Motif", "Entretien", "Top 3"]].concat(lignes.map(l => [l.e.nom, l.o.poste, l.c.id, l.c.prenom + " " + l.c.nom, l.c.genre, noteTxt(l.c), l.d ? l.d.decision : "à traiter", l.d ? l.d.motif : "", l.m ? LIB[l.m.mode] : "", l.rang || ""]));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.map(r => r.map(q).join(";")).join("\n")], {type: "text/csv"})); a.download = "suivi-entreprises.csv"; a.click();
 }
 function ficheEquipe(c, e, o) {
