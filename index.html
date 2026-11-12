@@ -116,15 +116,15 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
 <div id="modale" hidden></div>
 
 <script>
-const BLOBS = {"ef986da881b01d88": 1, "8b804900182d3cba": 1, "9b2c328ab996fd1f": 1, "bf807adb23963296": 1, "ca8da7e7a7f01af4": 1, "9407d8e09c4a46b5": 1, "ad8d1abb007232fa": 1, "ff88b8be0ce2da89": 1, "51be9b32206c358d": 1, "d470eef8a1038e32": 1, "fce39cb6e2c0e35c": 1, "0d5fcf6f22d346cf": 1, "d28595626e160663": 1, "dd0e110efec650aa": 1, "934eebdef66f82b6": 1, "4b1e4a4aafcf0ce8": 1, "1e7284f6eaa46e62": 1, "db2dcd6b7b2215aa": 1, "da9f48a97c57dbb6": 1, "4b87a11038d1369a": 1, "8b02a2147972a02e": 1, "2aaff86ad60ce6ba": 1, "bb8df8123570315c": 1, "54a6e518e0443ad3": 1, "0f14186aa2f175db": 1, "1cdbbfbd8113027e": 1, "7f1d98c9971839b6": 1, "c419bf15a68bb54b": 1, "eed5ced55ac2c0d9": 1, "834d8a51f44df754": 1, "21f773e282e387b0": 1, "ea823ab615e3bf26": 1, "dd4345c71fe6fc2a": 1, "ecc9a1eed6eb909c": 1, "f755a47e4f3005c9": 1, "5b0a769dcd5a0912": 1, "14f25ad5e2417497": 1, "e31ea74a737e958d": 1, "d3d88ee30c04305d": 1, "dc8b0111437385a7": 1, "3af18a7abd440835": 1, "8605ddd9a6753078": 1, "e8df18883de6a5b2": 1, "d03ccb9d71eccaf4": 12};
-const CONFIG = {"demo": {}, "sel": "PPnDJ0iZEQVHoEngGlQH/Q==", "iter": 200000, "endpoint": "", "apercu": false, "journal": [], "vivier_demo": []};
+const BLOBS = {"7a68722c63ff146f": 1, "da5c1e2b75c688d6": 1, "eb6c75d7330fac8a": 1, "b2065859a882d46f": 1, "ffb6a187c6e87089": 1, "f63bdc882edb1b92": 1, "b990851acf492027": 1, "6b3362bb47381820": 1, "4c2a2ba5da9ecf7a": 1, "5438ba655f832a15": 1, "98c7fbbb68481649": 1, "602e960ef4cb054a": 1, "35551233ba4e61b6": 1, "bfb2d0f625dc5732": 1, "acf5813536e8e8ef": 1, "822eb82b9e9716df": 1, "214ae833f20eaa02": 1, "cfdc8e0b7e81cda2": 1, "09bcfff8c55cc9c3": 1, "a91cde1b810a4d7a": 1, "e6909167d8899200": 1, "7c3e0b958071525d": 1, "02ebbfe9ee9c5936": 1, "ee2f37bc3d0b3580": 1, "6a260ff7550ac1eb": 1, "c0114f83f0653db3": 1, "e2452785e3d803e9": 1, "06ef2a29f740dec7": 1, "4a99586836796690": 1, "3dfa3f2eaa8b75e2": 1, "51c1d0e81ed86b6b": 1, "efb82bc53edb09c6": 1, "a403e59111d7f421": 1, "19db6f3e44d7a0c9": 1, "184bb61452a0427b": 1, "a53a5290973102fa": 1, "fc26a1bf888a40e1": 1, "3de79d7c0d1744c3": 1, "28c258cdebbda561": 1, "25820ab4717a7dc0": 1, "f8b4cb00f82be73d": 1, "f2522858cccda33e": 1, "bbc1adb0007859c2": 1, "f0c1a9928e8cf132": 12};
+const CONFIG = {"demo": {}, "sel": "m9NUcpHXjeE2nBRK/qqFpA==", "iter": 200000, "endpoint": "", "tally": {"form": "QoexV1", "groupe": "ba76939d-b9ee-449c-9ca3-862f154499cc", "champs": {"cle": "feae75cf-e795-4818-89e2-4a5b9c99471b", "entreprise": "93521726-6d8c-4503-9fb5-c4e1760f5f9e", "action": "081960ed-5654-4af4-94dd-cf3b9c8f6ba4", "offre": "747b4b01-70e0-4057-aaa3-4189887721d3", "candidat": "59883db7-898f-4876-9342-02992566fe6c", "decision": "01d86b74-d624-45c7-b17a-3687818a1245", "motif": "c109fa0f-cef0-4d80-b928-e407454e32c2", "donnees": "d627d1ca-942b-413d-bdd7-5c69cedfa3bd"}}, "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const hex = u => [...u].map(x => x.toString(16).padStart(2, "0")).join("");
-let D = null, CLE = "", ST = {dec: {}, top: {}}, offreCourante = null;
+let D = null, CLE = "", AESK = null, TAG = "", ST = {dec: {}, top: {}}, offreCourante = null;
 
 if (CONFIG.apercu) { const b = $("#bandeau"); b.hidden = false; b.textContent = "Aperçu de démonstration : candidats d'exemple, aucun envoi réel."; }
 
@@ -135,6 +135,25 @@ async function deriver(code) {
   return {tag: hex(bits.slice(32, 40)), cle: hex(bits.slice(40, 48)), aes: bits.slice(0, 32)};
 }
 const norm = c => c.normalize("NFKC").toUpperCase().replace(/[\u2010-\u2015\u2212\uFE63\uFF0D]/g, "-").replace(/\s+/g, "");
+async function restaurer() {
+  if (!CONFIG.tally || !AESK || D.equipe) return;
+  try {
+    const r = await fetch("j/" + TAG + ".enc?t=" + Date.now()); if (!r.ok) return;
+    const raw = b64((await r.text()).trim());
+    const ev = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, AESK, raw.slice(12))));
+    ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
+    const dec = {}, top = {}, aj = new Map();
+    ev.forEach(e => { if (e.action === "ajout" && e.candidat_data) aj.set(e.offre + "|" + e.candidat, e.candidat_data); if (e.action === "ajout_retire") aj.delete(e.offre + "|" + e.candidat); });
+    aj.forEach((c, k) => { const o = D.offres.find(x => x.id === k.split("|")[0]); if (o && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({manuel: true}, c)); });
+    ev.forEach(e => { const k = e.offre + "|" + e.candidat;
+      if (e.action === "decision") { if (e.decision === "annulee") delete dec[k]; else dec[k] = Object.assign(dec[k] || {plan: {}}, {d: e.decision, motif: e.motif, quand: e.quand}); }
+      else if (e.action === "email" && dec[k]) dec[k].entretien = {mode: e.mode, quand: e.quand, objet: e.objet};
+      else if (e.action === "top3") top[e.offre] = e.classement || []; });
+    Object.entries(dec).forEach(([k, v]) => { if (!(ST.dec[k] && ST.dec[k].d)) ST.dec[k] = Object.assign({}, v, ST.dec[k] || {}, {d: v.d, motif: v.motif, entretien: v.entretien || (ST.dec[k] || {}).entretien}); });
+    Object.entries(top).forEach(([o, l]) => { ST.top[o] = l; });
+    sauver(); rendre();
+  } catch (_) {}
+}
 async function ouvrir(code) {
   const net = norm(code);
   if (CONFIG.demo && CONFIG.demo[net]) return {data: CONFIG.demo[net], cle: "demo-" + CONFIG.demo[net].id};   // démonstration : données fictives, lisibles partout
@@ -147,11 +166,12 @@ async function ouvrir(code) {
   const raw = b64(blob);
   const key = await crypto.subtle.importKey("raw", k.aes, "AES-GCM", false, ["decrypt"]);
   const clair = await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, key, raw.slice(12));
+  AESK = key; TAG = k.tag;
   return {data: JSON.parse(new TextDecoder().decode(clair)), cle: k.cle};
 }
 $("#form-code").addEventListener("submit", async e => {
   e.preventDefault(); $("#err-code").textContent = ""; $("#bt-code").disabled = true;
-  try { const r = await ouvrir($("#code").value); D = r.data; CLE = r.cle; if (D.equipe) demarrerEquipe(); else demarrer(); }
+  try { const r = await ouvrir($("#code").value); D = r.data; CLE = r.cle; if (D.equipe) demarrerEquipe(); else { demarrer(); restaurer(); } }
   catch (er) { $("#err-code").textContent = er.message === "securite" ? "Ce navigateur bloque le déchiffrement quand la page est ouverte hors d'une adresse https. Ouvrez-la depuis son lien officiel ou téléchargez le fichier et ouvrez-le sur votre ordinateur." : "Ce code n'est pas reconnu. Vérifiez-le ou contactez recrutement@diaspora-connect.africa."; }
   $("#bt-code").disabled = false;
 });
@@ -161,10 +181,24 @@ $("#bt-sortir").onclick = () => { D = null; CLE = ""; $("#code").value = ""; $("
 function cleLocale() { return "dc-portail-" + CLE; }
 function sauver() { try { localStorage.setItem(cleLocale(), JSON.stringify(ST)); } catch (_) {} }
 function envoyer(action, payload) {
-  const corps = JSON.stringify({cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, ...payload, quand: new Date().toISOString()});
+  const base = {cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, ...payload, quand: new Date().toISOString()};
+  const T = CONFIG.tally;
+  if (T) {
+    const champs = {cle: base.cle, entreprise: base.entreprise, action, offre: base.offre || "", candidat: base.candidat || "", decision: base.decision || "", motif: base.motif || ""};
+    const reste = Object.assign({}, base); ["cle", "entreprise", "action", "offre", "candidat", "decision", "motif"].forEach(k => delete reste[k]);
+    champs.donnees = JSON.stringify(reste);
+    const h = {}; Object.entries(champs).forEach(([k, v]) => { if (v !== "" && v != null) h[T.champs[k]] = String(v); });
+    const u = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+    const essai = n => fetch("https://api.tally.so/forms/" + T.form + "/respond", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({sessionUuid: u(), respondentUuid: u(), responses: {[T.groupe]: h}, captchas: {}, isCompleted: true})})
+      .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return {ok: true}; })
+      .catch(e => n > 0 ? new Promise(res => setTimeout(res, 1500)).then(() => essai(n - 1)) : (alerteEnvoi(), {ok: false}));
+    return essai(2);
+  }
   if (!CONFIG.endpoint) return Promise.resolve({local: true});
-  return fetch(CONFIG.endpoint, {method: "POST", mode: "no-cors", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: corps}).then(() => ({ok: true}));
+  return fetch(CONFIG.endpoint, {method: "POST", mode: "no-cors", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(base)}).then(() => ({ok: true}));
 }
+function alerteEnvoi() { const m = document.createElement("div"); m.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1A1618;color:#fff;padding:12px 18px;border-radius:12px;z-index:99;font-size:14px;max-width:90vw"; m.textContent = "Votre action n'a pas pu être enregistrée. Vérifiez votre connexion et recommencez."; document.body.appendChild(m); setTimeout(() => m.remove(), 7000); }
 function lireAjouts() { try { return JSON.parse(localStorage.getItem("dc-ajouts")) || []; } catch (_) { return []; } }
 function demarrer() {
   if (CONFIG.vivier_demo) lireAjouts().forEach(a => { const o = a.entreprise === D.id && D.offres.find(x => x.id === a.offre), c = CONFIG.vivier_demo.find(x => x.id === a.candidat); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({manuel: true}, c)); });
@@ -216,7 +250,7 @@ function carte(o, c, top) {
   } else if (s.d === "refus") {
     bas = `<div class="zone"><b>Candidature refusée.</b><div class="meta">Motif : ${esc(s.motif)}</div><button style="margin-top:8px" data-annuler="${esc(c.id)}">Modifier ma décision</button></div>`;
   } else {
-    bas = `<div class="zone"><b>Candidature acceptée.</b> ${s.entretien ? `<span class="pastille v">Entretien : ${esc(LIB[s.entretien.mode])}, e-mail envoyé au candidat</span>` : ""}
+    bas = `<div class="zone"><b>Candidature acceptée.</b> ${s.entretien ? `<span class="pastille v">Entretien : ${esc(LIB[s.entretien.mode])}, e-mail enregistré, l'équipe Diaspora Connect l'envoie au candidat</span>` : ""}
       ${s.entretien ? "" : planif(o, c)}
       <div class="actions" style="border:0;margin-top:8px;padding:0"><button data-top="${esc(c.id)}" ${rang >= 0 ? "disabled" : ""}>Ajouter au top 3</button><button data-annuler="${esc(c.id)}">Modifier ma décision</button></div></div>`;
   }
@@ -280,13 +314,13 @@ function apercu(o, c) {
   if (manque.length) { alert("Merci de renseigner : " + manque.map(f => ({nom: "le nom", fonction: "la fonction", lien: "le lien de réservation", email: "l'e-mail", dispos: "vos disponibilités"})[f]).join(", ") + "."); return; }
   const m = monMail(o, c, p, mode);
   const el = $("#modale"); el.hidden = false;
-  el.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Aperçu de l'e-mail au candidat</h2><p class="meta">Voici exactement ce qui sera envoyé. Rien ne part avant votre confirmation.</p>
+  el.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Aperçu de l'e-mail au candidat</h2><p class="meta">Voici exactement l'e-mail qui sera adressé au candidat. Une fois confirmé, il est transmis à l'équipe Diaspora Connect qui l'envoie depuis recrutement@diaspora-connect.africa.</p>
    <div class="mail"><div class="ent"><div><b>De :</b> ${esc(m.de)}</div><div><b>À :</b> ${esc(m.a)}</div>${m.cc ? `<div><b>Copie :</b> ${esc(m.cc)}</div>` : ""}<div><b>Objet :</b> ${esc(m.objet)}</div></div><div class="corps">${m.corps}</div></div>
-   <div style="display:flex;gap:10px;justify-content:flex-end"><button id="m-non">Modifier</button><button class="prim" id="m-oui">Confirmer et envoyer</button></div></div></div>`;
+   <div style="display:flex;gap:10px;justify-content:flex-end"><button id="m-non">Modifier</button><button class="prim" id="m-oui">Confirmer cet e-mail</button></div></div></div>`;
   $("#m-non").onclick = () => { el.hidden = true; };
   $("#m-oui").onclick = async () => {
     $("#m-oui").disabled = true;
-    await envoyer("email", {offre: o.id, candidat: c.id, mode, planification: p, objet: m.objet});
+    await envoyer("email", {offre: o.id, candidat: c.id, mode, planification: p, objet: m.objet, mail: m});
     s.entretien = {mode, quand: new Date().toISOString(), objet: m.objet}; sauver(); el.hidden = true; rendre();
   };
 }
@@ -345,10 +379,15 @@ async function chargerJournal() {
         if (v.d) ev.push({quand: v.quand || "", entreprise: e.id, offre: o, candidat: c, action: "decision", decision: v.d, motif: v.motif});
         if (v.entretien) ev.push({quand: v.entretien.quand, entreprise: e.id, offre: o, candidat: c, action: "email", mode: v.entretien.mode, objet: v.entretien.objet, planification: v.plan}); });
       Object.entries(s.top || {}).forEach(([o, cl]) => ev.push({quand: "9999", entreprise: e.id, offre: o, action: "top3", classement: cl})); });
+  } else if (CONFIG.tally) {
+    try { const r = await fetch("j/" + TAG + ".enc?t=" + Date.now()); if (r.ok) { const raw = b64((await r.text()).trim()); const cl = await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, AESK, raw.slice(12)); ev = ev.concat(JSON.parse(new TextDecoder().decode(cl))); } }
+    catch (_) { $("#contenu-eq").innerHTML = '<div class="vide">Le journal n\'a pas pu être chargé. Réessayez dans un instant.</div>'; }
   } else if (CONFIG.endpoint) {
     try { const r = await fetch(CONFIG.endpoint + "?action=journal&cle=" + encodeURIComponent(CLE)); ev = ev.concat(await r.json()); } catch (_) { $("#contenu-eq").innerHTML = '<div class="vide">Le journal n\'a pas pu être chargé. Réessayez dans un instant.</div>'; }
   }
   EV = ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
+  if (CONFIG.tally) { const aj = new Map(); EV.forEach(e => { if (e.action === "ajout") aj.set(e.entreprise + "|" + e.offre + "|" + e.candidat, 1); if (e.action === "ajout_retire") aj.delete(e.entreprise + "|" + e.offre + "|" + e.candidat); });
+    aj.forEach((_, k) => { const [ei, oi, ci] = k.split("|"), e = D.entreprises.find(x => x.id === ei), o = e && e.offres.find(x => x.id === oi), c = (D.vivier || []).find(x => x.id === ci); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({manuel: true}, c)); }); }
 }
 function etatEquipe() {
   const dec = {}, mail = {}, top = {};
@@ -426,9 +465,10 @@ function journalHtml(L) {
   return L.map(e => { const ent = D.entreprises.find(x => x.id === e.entreprise), o = ent && ent.offres.find(x => x.id === e.offre), c = o && o.candidats.find(x => x.id === e.candidat);
     const qui = `<b>${esc(ent ? ent.nom : e.entreprise)}</b>`, cand = c ? `${esc(c.prenom)} ${esc(c.nom)}` : "", poste = o ? esc(o.poste) : "";
     const txt = e.action === "decision" ? (e.decision === "accepte" ? `${qui} a accepté ${cand} (${poste})` : e.decision === "refus" ? `${qui} a refusé ${cand} (${poste}). Motif : ${esc(e.motif || "")}` : `${qui} a annulé sa décision pour ${cand} (${poste})`)
-      : e.action === "email" ? `${qui} : e-mail d'entretien envoyé à ${cand} (${poste}), ${esc(LIB[e.mode] || e.mode)}`
+      : e.action === "email" ? `${qui} : e-mail d'entretien confirmé pour ${cand} (${poste}), ${esc(LIB[e.mode] || e.mode)}. À envoyer au candidat`
       : e.action === "top3" ? `${qui} a classé son top 3 pour ${poste} : ` + (e.classement || []).map((id, i) => { const x = o && o.candidats.find(y => y.id === id); return x ? `${i + 1}. ${esc(x.prenom)} ${esc(x.nom)}` : ""; }).filter(Boolean).join(", ") : esc(e.action);
-    return `<div class="jr"><time>${e.quand === "9999" ? "récent" : FR(e.quand)}</time><div>${txt}</div></div>`; }).join("");
+    const mailv = e.action === "email" && e.mail ? `<details style="margin-top:6px"><summary>Voir l'e-mail à envoyer</summary><div class="meta" style="white-space:pre-line;margin-top:6px"><b>De :</b> ${esc(e.mail.de)}\n<b>À :</b> ${esc(e.mail.a)}${e.mail.cc ? "\n<b>Copie :</b> " + esc(e.mail.cc) : ""}\n<b>Objet :</b> ${esc(e.mail.objet)}\n\n${esc(String(e.mail.corps || "").replace(/<br\s*\/?>|<\/p>/gi, "\n").replace(/<[^>]+>/g, ""))}</div></details>` : "";
+    return `<div class="jr"><time>${e.quand === "9999" ? "récent" : FR(e.quand)}</time><div>${txt}${mailv}</div></div>`; }).join("");
 }
 function exporterCsv(lignes) {
   const S = etatEquipe(), q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
