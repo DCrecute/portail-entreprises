@@ -171,13 +171,16 @@ async function ouvrir(code) {
 }
 $("#form-code").addEventListener("submit", async e => {
   e.preventDefault(); $("#err-code").textContent = ""; $("#bt-code").disabled = true;
-  try { const r = await ouvrir($("#code").value); D = r.data; CLE = r.cle; if (D.equipe) demarrerEquipe(); else { demarrer(); restaurer(); } }
+  try { const r = await ouvrir($("#code").value); D = r.data; CLE = r.cle; try { sessionStorage.setItem("dc-session", JSON.stringify({c: $("#code").value, t: Date.now()})); } catch (_) {} if (D.equipe) demarrerEquipe(); else { demarrer(); restaurer(); } }
   catch (er) { $("#err-code").textContent = er.message === "securite" ? "Ce navigateur bloque le déchiffrement quand la page est ouverte hors d'une adresse https. Ouvrez-la depuis son lien officiel ou téléchargez le fichier et ouvrez-le sur votre ordinateur." : "Ce code n'est pas reconnu. Vérifiez-le ou contactez recrutement@diaspora-connect.africa."; }
   $("#bt-code").disabled = false;
 });
-$("#bt-sortir-eq").onclick = () => { D = null; CLE = ""; $("#code").value = ""; $("#vue-equipe").hidden = true; $("#vue-entree").hidden = false; };
-$("#bt-sortir").onclick = () => { D = null; CLE = ""; $("#code").value = ""; $("#vue-app").hidden = true; $("#vue-entree").hidden = false; };
+$("#bt-sortir-eq").onclick = () => { try { sessionStorage.removeItem("dc-session"); } catch (_) {} D = null; CLE = ""; $("#code").value = ""; $("#vue-equipe").hidden = true; $("#vue-entree").hidden = false; };
+$("#bt-sortir").onclick = () => { try { sessionStorage.removeItem("dc-session"); } catch (_) {} D = null; CLE = ""; $("#code").value = ""; $("#vue-app").hidden = true; $("#vue-entree").hidden = false; };
 
+
+/* reconnexion automatique après actualisation : la session reste dans l'onglet (12 h au plus), jamais sur disque */
+setTimeout(() => { try { const s = JSON.parse(sessionStorage.getItem("dc-session") || "null"); if (s && s.c && Date.now() - s.t < 12 * 3600 * 1000) { $("#code").value = s.c; $("#form-code").requestSubmit(); } else sessionStorage.removeItem("dc-session"); } catch (_) {} }, 0);
 function cleLocale() { return "dc-portail-" + CLE; }
 function sauver() { try { localStorage.setItem(cleLocale(), JSON.stringify(ST)); } catch (_) {} }
 function envoyer(action, payload) {
