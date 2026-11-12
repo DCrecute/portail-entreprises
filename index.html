@@ -116,8 +116,8 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
 <div id="modale" hidden></div>
 
 <script>
-const BLOBS = {"d39395ce1880d14d": 1, "dc6b18300ca9b16a": 1, "b52d28af93cb3eb9": 1, "e887d9eeba538c46": 1, "3ce9398481edd08e": 1, "9fa864ebfd2abb77": 1, "6bffcb155f871ead": 1, "1f989613b91a3204": 1, "5ef8d52945b06c6f": 1, "9c33b859a7e42db9": 1, "011ebb00e1ff0c16": 1, "8eaa26a420337233": 1, "bbcd4a686a286287": 1, "7ad9eaf6684b448e": 1, "13145a78fa92918e": 1, "4cef7e53b0ebbccf": 1, "9dbfb40a711398e1": 1, "a6cdfa1e736f9962": 1, "fce12f6de2b0488f": 1, "915d9aa567d32d3a": 1, "db985fa4f2ec83c6": 1, "ab310cc4ddee4931": 1, "b39701f9cc2de573": 1, "aafeb863ac415016": 1, "03e933770ad8ea54": 1, "b6ee2c20712c177a": 1, "1986b41364770ef5": 1, "3198691a16743a12": 1, "52f5622a5b86674b": 1, "b22de0483939c910": 1, "f35b33904adbed54": 1, "1adbbd6e8ba44ab5": 1, "459129563b51c3ed": 1, "38399eb85c098d72": 1, "c6d5b489ea289f29": 1, "a03e7a9a52f67b22": 1, "52309b64055f758c": 1, "19cd13c8bd0e1ae6": 1, "b9866f609fcbb5c0": 1, "c4e78de849823e3e": 1, "2de24f77cf2787df": 1, "907faf9c67cc0b5c": 1, "50e1694f1029467f": 1, "587501f0d2ee1de3": 13};
-const CONFIG = {"demo": {}, "sel": "5wuCR3H6f11TAYP7mGQl5Q==", "iter": 200000, "endpoint": "", "apercu": false, "journal": [], "vivier_demo": []};
+const BLOBS = {"ef986da881b01d88": 1, "8b804900182d3cba": 1, "9b2c328ab996fd1f": 1, "bf807adb23963296": 1, "ca8da7e7a7f01af4": 1, "9407d8e09c4a46b5": 1, "ad8d1abb007232fa": 1, "ff88b8be0ce2da89": 1, "51be9b32206c358d": 1, "d470eef8a1038e32": 1, "fce39cb6e2c0e35c": 1, "0d5fcf6f22d346cf": 1, "d28595626e160663": 1, "dd0e110efec650aa": 1, "934eebdef66f82b6": 1, "4b1e4a4aafcf0ce8": 1, "1e7284f6eaa46e62": 1, "db2dcd6b7b2215aa": 1, "da9f48a97c57dbb6": 1, "4b87a11038d1369a": 1, "8b02a2147972a02e": 1, "2aaff86ad60ce6ba": 1, "bb8df8123570315c": 1, "54a6e518e0443ad3": 1, "0f14186aa2f175db": 1, "1cdbbfbd8113027e": 1, "7f1d98c9971839b6": 1, "c419bf15a68bb54b": 1, "eed5ced55ac2c0d9": 1, "834d8a51f44df754": 1, "21f773e282e387b0": 1, "ea823ab615e3bf26": 1, "dd4345c71fe6fc2a": 1, "ecc9a1eed6eb909c": 1, "f755a47e4f3005c9": 1, "5b0a769dcd5a0912": 1, "14f25ad5e2417497": 1, "e31ea74a737e958d": 1, "d3d88ee30c04305d": 1, "dc8b0111437385a7": 1, "3af18a7abd440835": 1, "8605ddd9a6753078": 1, "e8df18883de6a5b2": 1, "d03ccb9d71eccaf4": 12};
+const CONFIG = {"demo": {}, "sel": "PPnDJ0iZEQVHoEngGlQH/Q==", "iter": 200000, "endpoint": "", "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
 const $ = s => document.querySelector(s);
@@ -335,7 +335,7 @@ function formulaireRefus(o, c) {
 }
 
 /* ---------- espace équipe ---------- */
-let EV = [], ONG_EQ = "synthese", FILTRE_EQ = "";
+let EV = [], ONG_EQ = "synthese", FILTRE_EQ = "", Q_CAND = "", F_CAND = "tous";
 const FR = d => { try { return new Date(d).toLocaleString("fr-FR", {timeZone: "Africa/Abidjan", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}); } catch (_) { return d || ""; } };
 async function chargerJournal() {
   let ev = (CONFIG.journal || []).slice();
@@ -364,7 +364,7 @@ async function demarrerEquipe() {
   await chargerJournal(); rendreEquipe();
 }
 function rendreEquipe() {
-  const ONG = [["synthese", "Synthèse"], ["entreprises", "Par entreprise"], ["journal", "Journal"]];
+  const ONG = [["synthese", "Synthèse"], ["candidats", "Candidats"], ["entreprises", "Par entreprise"], ["journal", "Journal"]];
   $("#onglets-eq").innerHTML = ONG.map(([k, l]) => `<button class="${k === ONG_EQ ? "actif" : ""}" data-k="${k}">${l}</button>`).join("");
   document.querySelectorAll("#onglets-eq button").forEach(b => b.onclick = () => { ONG_EQ = b.dataset.k; rendreEquipe(); });
   const S = etatEquipe();
@@ -380,6 +380,7 @@ function rendreEquipe() {
       <h3 style="margin:18px 0 8px">Dernières actions</h3>${journalHtml(EV.slice(-8).reverse())}`;
     return;
   }
+  if (ONG_EQ === "candidats") { rendreCandidats(lignes, S); return; }
   if (ONG_EQ === "journal") { el.innerHTML = `<div class="tools"><button id="csv">Exporter le suivi (CSV)</button></div>` + journalHtml(EV.slice().reverse()); $("#csv").onclick = () => exporterCsv(lignes); return; }
   el.innerHTML = `<div class="tools"><label style="margin:0;flex-direction:row;align-items:center;gap:8px">Entreprise <select id="f-ent"><option value="">Toutes</option>${D.entreprises.map(e => `<option value="${esc(e.id)}" ${FILTRE_EQ === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}</select></label><button id="csv">Exporter le suivi (CSV)</button></div>` +
     D.entreprises.filter(e => !FILTRE_EQ || e.id === FILTRE_EQ).map(e => `<h2 style="font-size:22px;margin:22px 0 8px">${esc(e.nom)}</h2>` + e.offres.map(o => `<div style="display:flex;align-items:center;gap:12px;margin:10px 0 6px"><h3>${esc(o.poste)}</h3><button data-ajout="${esc(e.id)}|${esc(o.id)}">+ Ajouter un candidat</button></div>
@@ -394,6 +395,31 @@ function rendreEquipe() {
   $("#f-ent").onchange = ev => { FILTRE_EQ = ev.target.value; rendreEquipe(); };
   $("#csv").onclick = () => exporterCsv(lignes);
   document.querySelectorAll("[data-fiche]").forEach(b => b.onclick = () => { const [ei, oi, ci] = b.dataset.fiche.split("|"); const e = D.entreprises.find(x => x.id === ei), o = e.offres.find(x => x.id === oi); ficheEquipe(o.candidats.find(x => x.id === ci), e, o); });
+}
+
+function rendreCandidats(lignes, S) {
+  const M = new Map();
+  const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  lignes.forEach(l => { if (!M.has(l.c.id)) M.set(l.c.id, {c: l.c, pl: []}); M.get(l.c.id).pl.push(l); });
+  (D.vivier || []).forEach(c => { if (!M.has(c.id)) M.set(c.id, {c, pl: []}); });
+  const NE = new Set(D.non_eligibles || []);
+  let L = [...M.values()].filter(x => !NE.has(x.c.id)).sort((a, b) => b.pl.length - a.pl.length || (a.c.nom + a.c.prenom).localeCompare(b.c.nom + b.c.prenom));
+  const tot = L.length, n0 = L.filter(x => !x.pl.length).length, n1 = L.filter(x => x.pl.length === 1).length, n2 = L.filter(x => x.pl.length > 1).length;
+  const q = norm(Q_CAND);
+  L = L.filter(x => (F_CAND === "tous" || (F_CAND === "0" && !x.pl.length) || (F_CAND === "1" && x.pl.length >= 1) || (F_CAND === "2" && x.pl.length >= 2)) && (!q || norm(x.c.prenom + " " + x.c.nom + " " + x.c.id + " " + x.pl.map(p => p.e.nom + " " + p.o.poste).join(" ")).includes(q)));
+  const stat = p => p.d ? (p.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') : '<span class="pastille">À traiter</span>';
+  const notif = x => `<span class="pastille ${x.pl.length ? "v" : "g"}" title="Nombre d'entreprises où il est shortlisté" style="font-weight:700;min-width:28px;text-align:center">${x.pl.length}</span>`;
+  const el = $("#contenu-eq");
+  el.innerHTML = `<div class="kpis">${[["Candidats au total", tot], ["Shortlistés chez 1 entreprise", n1], ["Shortlistés chez 2 ou plus", n2], ["Aucune entreprise", n0]].map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+   <div class="tools"><input id="q-cand" type="search" placeholder="Chercher un candidat, un n° de dossier, une entreprise ou une offre" value="${esc(Q_CAND)}" style="flex:1;min-width:240px">
+   <select id="f-cand"><option value="tous" ${F_CAND === "tous" ? "selected" : ""}>Tous les candidats</option><option value="1" ${F_CAND === "1" ? "selected" : ""}>Shortlistés (1 entreprise ou plus)</option><option value="2" ${F_CAND === "2" ? "selected" : ""}>Shortlistés chez 2 ou plus</option><option value="0" ${F_CAND === "0" ? "selected" : ""}>Aucune entreprise</option></select></div>
+   <p class="meta">${L.length} candidat${L.length > 1 ? "s" : ""} affiché${L.length > 1 ? "s" : ""}.</p>
+   <table class="t"><tr><th>Candidat</th><th>Shortlist</th><th>Entreprises et offres</th><th></th></tr>${L.map(x => `<tr><td><b>${esc(x.c.prenom)} ${esc(x.c.nom)}</b><div class="meta">Dossier ${esc(x.c.id)}</div></td><td>${notif(x)}</td>
+   <td>${x.pl.length ? x.pl.map(p => `<div style="margin:2px 0"><b>${esc(p.e.nom)}</b> · ${esc(p.o.poste)} ${stat(p)}${p.rang ? `<span class="pastille v">Top ${p.rang}</span>` : ""}${p.m ? '<span class="pastille v">Entretien planifié</span>' : ""}${p.c.manuel ? '<span class="pastille">Ajout manuel</span>' : ""}</div>`).join("") : '<span class="meta">—</span>'}</td>
+   <td><button data-cand="${esc(x.c.id)}">Voir le dossier</button></td></tr>`).join("")}</table>`;
+  $("#q-cand").oninput = ev => { Q_CAND = ev.target.value; const p = ev.target.selectionStart; rendreEquipe(); const i = $("#q-cand"); i.focus(); i.setSelectionRange(p, p); };
+  $("#f-cand").onchange = ev => { F_CAND = ev.target.value; rendreEquipe(); };
+  document.querySelectorAll("[data-cand]").forEach(b => b.onclick = () => { const x = M.get(b.dataset.cand); const p = x.pl[0]; ficheEquipe(x.c, p ? p.e : null, p ? p.o : null); });
 }
 function journalHtml(L) {
   if (!L.length) return '<div class="vide">Aucune action d\'entreprise pour l\'instant.</div>';
@@ -414,7 +440,7 @@ function ficheEquipe(c, e, o) {
   const crit = NOTES.filter(n => c.notes && c.notes[n[0]]).map(n => `<div style="margin:8px 0"><div style="display:flex;justify-content:space-between"><b>${n[1]}</b>${etoiles(c.notes[n[0]])}</div>${en && en.commentaires && en.commentaires[n[0]] ? `<div class="meta" style="margin-top:2px">${esc(en.commentaires[n[0]])}</div>` : ""}</div>`).join("");
   const m = $("#modale"); m.hidden = false;
   m.innerHTML = `<div class="fond"><div class="modale large"><h2 style="font-size:22px">${esc(c.prenom)} ${esc(c.nom)}</h2><div>${badges(c)}</div>
-   <p class="meta">Offre : ${esc(o.poste)} · ${esc(e.nom)}</p>
+   <p class="meta">${o ? "Offre : " + esc(o.poste) + " · " + esc(e.nom) : "Pas encore shortlisté chez une entreprise"}</p>
    ${dossierHtml(c, true)}
    <div style="margin:14px 0 0;display:flex;gap:10px;flex-wrap:wrap"><button class="prim" id="bt-ff">Voir le résumé Fireflies et la notation complète</button>${en && en.fireflies_url ? `<a class="btn" href="${esc(en.fireflies_url)}" target="_blank" rel="noopener">Ouvrir l'enregistrement dans Fireflies ↗</a>` : ""}</div>
    <div class="ff" id="ff" hidden><h3 style="font-size:17px;margin-bottom:6px">Entretien de découverte <span class="meta">(équipe uniquement)</span></h3>
