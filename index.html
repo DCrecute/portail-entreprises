@@ -421,7 +421,7 @@ function rendreEquipe() {
   }
   if (ONG_EQ === "candidats") { rendreCandidats(lignes, S); return; }
   if (ONG_EQ === "journal") { el.innerHTML = `<div class="tools"><button id="csv">Exporter le suivi (CSV)</button></div>` + journalHtml(EV.slice().reverse()); $("#csv").onclick = () => exporterCsv(lignes); return; }
-  el.innerHTML = `<div class="tools"><label style="margin:0;flex-direction:row;align-items:center;gap:8px">Entreprise <select id="f-ent"><option value="">Toutes</option>${D.entreprises.map(e => `<option value="${esc(e.id)}" ${FILTRE_EQ === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}</select></label><button id="csv">Exporter le suivi (CSV)</button></div>` +
+  el.innerHTML = `<div class="tools"><label style="margin:0;flex-direction:row;align-items:center;gap:8px">Entreprise <select id="f-ent"><option value="">Toutes</option>${[...D.entreprises].sort((x, y) => x.nom.localeCompare(y.nom, "fr", {sensitivity: "base"})).map(e => `<option value="${esc(e.id)}" ${FILTRE_EQ === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}</select></label><button id="csv">Exporter le suivi (CSV)</button></div>` +
     D.entreprises.filter(e => !FILTRE_EQ || e.id === FILTRE_EQ).map(e => `<h2 style="font-size:22px;margin:22px 0 8px">${esc(e.nom)}</h2>` + e.offres.map(o => `<div style="display:flex;align-items:center;gap:12px;margin:10px 0 6px"><h3>${esc(o.poste)}</h3><button data-ajout="${esc(e.id)}|${esc(o.id)}">+ Ajouter un candidat</button></div>
       <table class="t"><tr><th>Candidat</th><th>Décision</th><th>Entretien</th><th>Top 3</th><th></th></tr>${lignes.filter(l => l.e.id === e.id && l.o.id === o.id).map(l => `<tr>
         <td><b>${esc(l.c.prenom)} ${esc(l.c.nom)}</b><div>${badges(l.c)}</div></td>
