@@ -4,6 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+.annule{color:#d00000;font-weight:700}
 :root{--red:#E10106;--orange:#F16900;--yellow:#FDCD00;--violet:#6E2C90;--blue:#0198E9;--ink:#1A1618;--muet:#6B6266;--ligne:#EAE2DE;--cream:#F6EFEA;--ok:#17663A;--okbg:#D8F3DE}
 *{box-sizing:border-box}body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:15px;line-height:1.45}
 h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;margin:0}
@@ -121,6 +122,7 @@ const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
 const $ = s => document.querySelector(s);
+const PN = o => esc(o.poste) + (o.annule ? ' <span class="annule">(ANNULÉ)</span>' : "");
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const hex = u => [...u].map(x => x.toString(16).padStart(2, "0")).join("");
@@ -221,7 +223,7 @@ const offre = () => D.offres.find(o => o.id === offreCourante);
 function rendre() {
   $("#onglets").innerHTML = D.offres.map(o => {
     const n = o.candidats.length, a = o.candidats.filter(c => (ST.dec[kd(o, c)] || {}).d).length;
-    return `<button class="${o.id === offreCourante ? "actif" : ""}" data-o="${esc(o.id)}">${esc(o.poste)} <span class="meta" style="color:inherit;opacity:.7">· ${a}/${n} traité${a > 1 ? "s" : ""}</span></button>`;
+    return `<button class="${o.id === offreCourante ? "actif" : ""}" data-o="${esc(o.id)}">${PN(o)} <span class="meta" style="color:inherit;opacity:.7">· ${a}/${n} traité${a > 1 ? "s" : ""}</span></button>`;
   }).join("");
   document.querySelectorAll("#onglets button").forEach(b => b.onclick = () => { offreCourante = b.dataset.o; rendre(); });
   const o = offre();
@@ -234,7 +236,7 @@ function rendre() {
       (c ? `<div style="display:flex;align-items:center;gap:8px"><b>${esc(c.prenom)} ${esc(c.nom)}</b><button class="x" data-retirer="${i}" title="Retirer">✕</button></div>` : '<span class="meta">Glissez un candidat ici</span>') + "</div>";
   };
   $("#offre").innerHTML = `
-   <div class="offre-tete"><div><h2>${esc(o.poste)}</h2><div class="sub">${esc(o.contrat || "")}${o.contrat && o.lieu ? " · " : ""}${esc(o.lieu || "")} · ${o.candidats.length} candidat${o.candidats.length > 1 ? "s" : ""} sélectionné${o.candidats.length > 1 ? "s" : ""}</div></div>
+   <div class="offre-tete"><div><h2>${PN(o)}</h2><div class="sub">${esc(o.contrat || "")}${o.contrat && o.lieu ? " · " : ""}${esc(o.lieu || "")} · ${o.candidats.length} candidat${o.candidats.length > 1 ? "s" : ""} sélectionné${o.candidats.length > 1 ? "s" : ""}</div></div>
     <a class="btn" style="margin-left:auto" href="${URL_OFFRES}" target="_blank" rel="noopener">Revoir l'offre et se préparer</a></div>
    <div class="top3"><h3>Votre top 3</h3><div class="aide">Glissez-déposez les candidats retenus dans l'ordre de votre préférence (ou utilisez « Ajouter au top 3 » sur la carte).</div>
     <div class="slots">${[0, 1, 2].map(slot).join("")}</div></div>
@@ -427,7 +429,7 @@ function rendreEquipe() {
   if (ONG_EQ === "candidats") { rendreCandidats(lignes, S); return; }
   if (ONG_EQ === "journal") { el.innerHTML = `<div class="tools"><button id="csv">Exporter le suivi (CSV)</button></div>` + journalHtml(EV.slice().reverse()); $("#csv").onclick = () => exporterCsv(lignes); return; }
   el.innerHTML = `<div class="tools"><label style="margin:0;flex-direction:row;align-items:center;gap:8px">Entreprise <select id="f-ent"><option value="">Toutes</option>${[...D.entreprises].sort((x, y) => x.nom.localeCompare(y.nom, "fr", {sensitivity: "base"})).map(e => `<option value="${esc(e.id)}" ${FILTRE_EQ === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}</select></label><button id="csv">Exporter le suivi (CSV)</button></div>` +
-    D.entreprises.filter(e => !FILTRE_EQ || e.id === FILTRE_EQ).map(e => `<h2 style="font-size:22px;margin:22px 0 8px">${esc(e.nom)}</h2>` + e.offres.map(o => `<div style="display:flex;align-items:center;gap:12px;margin:10px 0 6px"><h3>${esc(o.poste)}</h3><button data-ajout="${esc(e.id)}|${esc(o.id)}">+ Ajouter un candidat</button></div>
+    D.entreprises.filter(e => !FILTRE_EQ || e.id === FILTRE_EQ).map(e => `<h2 style="font-size:22px;margin:22px 0 8px">${esc(e.nom)}</h2>` + e.offres.map(o => `<div style="display:flex;align-items:center;gap:12px;margin:10px 0 6px"><h3>${PN(o)}</h3><button data-ajout="${esc(e.id)}|${esc(o.id)}">+ Ajouter un candidat</button></div>
       <table class="t"><tr><th>Candidat</th><th>Décision</th><th>Entretien</th><th>Top 3</th><th></th></tr>${lignes.filter(l => l.e.id === e.id && l.o.id === o.id).map(l => `<tr>
         <td><b>${esc(l.c.prenom)} ${esc(l.c.nom)}</b><div>${badges(l.c)}</div></td>
         <td>${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') + `<div class="meta">${FR(l.d.quand)}</div>` + (l.d.motif ? `<div class="meta"><b>Motif :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">À traiter</span>'}</td>
@@ -459,7 +461,7 @@ function rendreCandidats(lignes, S) {
    <select id="f-cand"><option value="tous" ${F_CAND === "tous" ? "selected" : ""}>Tous les candidats</option><option value="1" ${F_CAND === "1" ? "selected" : ""}>Shortlistés (1 entreprise ou plus)</option><option value="2" ${F_CAND === "2" ? "selected" : ""}>Shortlistés chez 2 ou plus</option><option value="0" ${F_CAND === "0" ? "selected" : ""}>Aucune entreprise</option></select></div>
    <p class="meta">${L.length} candidat${L.length > 1 ? "s" : ""} affiché${L.length > 1 ? "s" : ""}.</p>
    <table class="t"><tr><th>Candidat</th><th>Shortlist</th><th>Entreprises et offres</th><th></th></tr>${L.map(x => `<tr><td><b>${esc(x.c.prenom)} ${esc(x.c.nom)}</b><div class="meta">Dossier ${esc(x.c.id)}</div></td><td>${notif(x)}</td>
-   <td>${x.pl.length ? x.pl.map(p => `<div style="margin:2px 0"><b>${esc(p.e.nom)}</b> · ${esc(p.o.poste)} ${stat(p)}${p.rang ? `<span class="pastille v">Top ${p.rang}</span>` : ""}${p.m ? '<span class="pastille v">Entretien planifié</span>' : ""}${p.c.manuel ? '<span class="pastille">Ajout manuel</span>' : ""}</div>`).join("") : '<span class="meta">—</span>'}</td>
+   <td>${x.pl.length ? x.pl.map(p => `<div style="margin:2px 0"><b>${esc(p.e.nom)}</b> · ${PN(p.o)} ${stat(p)}${p.rang ? `<span class="pastille v">Top ${p.rang}</span>` : ""}${p.m ? '<span class="pastille v">Entretien planifié</span>' : ""}${p.c.manuel ? '<span class="pastille">Ajout manuel</span>' : ""}</div>`).join("") : '<span class="meta">—</span>'}</td>
    <td><button data-cand="${esc(x.c.id)}">Voir le dossier</button></td></tr>`).join("")}</table>`;
   $("#q-cand").oninput = ev => { Q_CAND = ev.target.value; const p = ev.target.selectionStart; rendreEquipe(); const i = $("#q-cand"); i.focus(); i.setSelectionRange(p, p); };
   $("#f-cand").onchange = ev => { F_CAND = ev.target.value; rendreEquipe(); };
@@ -468,7 +470,7 @@ function rendreCandidats(lignes, S) {
 function journalHtml(L) {
   if (!L.length) return '<div class="vide">Aucune action d\'entreprise pour l\'instant.</div>';
   return L.map(e => { const ent = D.entreprises.find(x => x.id === e.entreprise), o = ent && ent.offres.find(x => x.id === e.offre), c = o && o.candidats.find(x => x.id === e.candidat);
-    const qui = `<b>${esc(ent ? ent.nom : e.entreprise)}</b>`, cand = c ? `${esc(c.prenom)} ${esc(c.nom)}` : "", poste = o ? esc(o.poste) : "";
+    const qui = `<b>${esc(ent ? ent.nom : e.entreprise)}</b>`, cand = c ? `${esc(c.prenom)} ${esc(c.nom)}` : "", poste = o ? PN(o) : "";
     const txt = e.action === "decision" ? (e.decision === "accepte" ? `${qui} a accepté ${cand} (${poste})` : e.decision === "refus" ? `${qui} a refusé ${cand} (${poste}). Motif : ${esc(e.motif || "")}` : `${qui} a annulé sa décision pour ${cand} (${poste})`)
       : e.action === "email" ? `${qui} : e-mail d'entretien confirmé pour ${cand} (${poste}), ${esc(LIB[e.mode] || e.mode)}. À envoyer au candidat`
       : e.action === "top3" ? `${qui} a classé son top 3 pour ${poste} : ` + (e.classement || []).map((id, i) => { const x = o && o.candidats.find(y => y.id === id); return x ? `${i + 1}. ${esc(x.prenom)} ${esc(x.nom)}` : ""; }).filter(Boolean).join(", ") : esc(e.action);
@@ -477,7 +479,7 @@ function journalHtml(L) {
 }
 function exporterCsv(lignes) {
   const S = etatEquipe(), q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-  const rows = [["Entreprise", "Offre", "Dossier", "Candidat", "Genre", "Note /5", "Décision", "Motif", "Entretien", "Top 3"]].concat(lignes.map(l => [l.e.nom, l.o.poste, l.c.id, l.c.prenom + " " + l.c.nom, l.c.genre, noteTxt(l.c), l.d ? l.d.decision : "à traiter", l.d ? l.d.motif : "", l.m ? LIB[l.m.mode] : "", l.rang || ""]));
+  const rows = [["Entreprise", "Offre", "Dossier", "Candidat", "Genre", "Note /5", "Décision", "Motif", "Entretien", "Top 3"]].concat(lignes.map(l => [l.e.nom, l.o.poste + (l.o.annule ? " (ANNULÉ)" : ""), l.c.id, l.c.prenom + " " + l.c.nom, l.c.genre, noteTxt(l.c), l.d ? l.d.decision : "à traiter", l.d ? l.d.motif : "", l.m ? LIB[l.m.mode] : "", l.rang || ""]));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.map(r => r.map(q).join(";")).join("\n")], {type: "text/csv"})); a.download = "suivi-entreprises.csv"; a.click();
 }
 function ficheEquipe(c, e, o) {
@@ -485,7 +487,7 @@ function ficheEquipe(c, e, o) {
   const crit = NOTES.filter(n => c.notes && c.notes[n[0]]).map(n => `<div style="margin:8px 0"><div style="display:flex;justify-content:space-between"><b>${n[1]}</b>${etoiles(c.notes[n[0]])}</div>${en && en.commentaires && en.commentaires[n[0]] ? `<div class="meta" style="margin-top:2px">${esc(en.commentaires[n[0]])}</div>` : ""}</div>`).join("");
   const m = $("#modale"); m.hidden = false;
   m.innerHTML = `<div class="fond"><div class="modale large"><h2 style="font-size:22px">${esc(c.prenom)} ${esc(c.nom)}</h2><div>${badges(c)}</div>
-   <p class="meta">${o ? "Offre : " + esc(o.poste) + " · " + esc(e.nom) : "Pas encore shortlisté chez une entreprise"}</p>
+   <p class="meta">${o ? "Offre : " + PN(o) + " · " + esc(e.nom) : "Pas encore shortlisté chez une entreprise"}</p>
    ${dossierHtml(c, true)}
    <div style="margin:14px 0 0;display:flex;gap:10px;flex-wrap:wrap"><button class="prim" id="bt-ff">Voir le résumé Fireflies et la notation complète</button>${en && en.fireflies_url ? `<a class="btn" href="${esc(en.fireflies_url)}" target="_blank" rel="noopener">Ouvrir l'enregistrement dans Fireflies ↗</a>` : ""}</div>
    <div class="ff" id="ff" hidden><h3 style="font-size:17px;margin-bottom:6px">Entretien de découverte <span class="meta">(équipe uniquement)</span></h3>
@@ -501,7 +503,7 @@ function poolCand() { const M = new Map(); (D.vivier || []).forEach(c => M.set(c
 function ajouterManuel(e, offreId) {
   const o = e.offres.find(x => x.id === offreId), m = $("#modale"); m.hidden = false;
   const deja = new Set(o.candidats.map(c => c.id));
-  m.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Ajouter un candidat à ${esc(o.poste)}</h2><p class="meta">${esc(e.nom)}. Recherchez par nom ou par numéro de dossier. Le candidat apparaîtra dans l'espace de l'entreprise, avec la mention « Ajout manuel » côté équipe.</p>
+  m.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Ajouter un candidat à ${PN(o)}</h2><p class="meta">${esc(e.nom)}. Recherchez par nom ou par numéro de dossier. Le candidat apparaîtra dans l'espace de l'entreprise, avec la mention « Ajout manuel » côté équipe.</p>
    <label>Rechercher<input id="aj-q" placeholder="Nom, prénom ou numéro de dossier" autocomplete="off"></label><div id="aj-res"></div>
    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="aj-x">Fermer</button></div></div></div>`;
   const liste = () => { const q = $("#aj-q").value.trim().toLowerCase(); const mots = q.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter(Boolean); const L = poolCand().filter(c => !deja.has(c.id) && (() => { const h = (c.prenom + " " + c.nom + " " + c.id).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); return mots.every(w => h.includes(w)); })()).slice(0, 8);
