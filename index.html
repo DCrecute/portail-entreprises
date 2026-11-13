@@ -149,8 +149,9 @@ async function restaurer() {
     ev.forEach(e => { const k = e.offre + "|" + e.candidat;
       if (e.action === "decision") { if (e.decision === "annulee") delete dec[k]; else dec[k] = Object.assign(dec[k] || {plan: {}}, {d: e.decision, motif: e.motif, quand: e.quand}); }
       else if (e.action === "email" && dec[k]) dec[k].entretien = {mode: e.mode, quand: e.quand, objet: e.objet};
+      else if (e.action === "business_case" && dec[k]) dec[k].bc = {quand: e.quand, objet: e.objet, restitution: e.restitution};
       else if (e.action === "top3") top[e.offre] = e.classement || []; });
-    Object.entries(dec).forEach(([k, v]) => { if (!(ST.dec[k] && ST.dec[k].d)) ST.dec[k] = Object.assign({}, v, ST.dec[k] || {}, {d: v.d, motif: v.motif, entretien: v.entretien || (ST.dec[k] || {}).entretien}); });
+    Object.entries(dec).forEach(([k, v]) => { if (!(ST.dec[k] && ST.dec[k].d)) ST.dec[k] = Object.assign({}, v, ST.dec[k] || {}, {d: v.d, motif: v.motif, entretien: v.entretien || (ST.dec[k] || {}).entretien, bc: v.bc || (ST.dec[k] || {}).bc}); });
     Object.entries(top).forEach(([o, l]) => { ST.top[o] = l; });
     sauver(); rendre();
   } catch (_) {}
@@ -255,8 +256,9 @@ function carte(o, c, top) {
     bas = `<div class="zone"><b>Candidature refusée.</b><div class="meta">Motif : ${esc(s.motif)}</div><button style="margin-top:8px" data-annuler="${esc(c.id)}">Modifier ma décision</button></div>`;
   } else {
     bas = `<div class="zone"><b>Candidature acceptée.</b> ${s.entretien ? `<span class="pastille v">Entretien : ${esc(LIB[s.entretien.mode])}, e-mail enregistré, l'équipe Diaspora Connect l'envoie au candidat</span>` : ""}
+      ${s.bc ? `<span class="pastille v">Business case : ${esc(s.bc.restitution && s.bc.restitution.mode === "oral" ? "restitution orale" : "restitution par e-mail")}, e-mail enregistré, l'équipe Diaspora Connect l'envoie au candidat</span>` : ""}
       ${s.entretien ? "" : planif(o, c)}
-      <div class="actions" style="border:0;margin-top:8px;padding:0"><button data-top="${esc(c.id)}" ${rang >= 0 ? "disabled" : ""}>Ajouter au top 3</button><button data-annuler="${esc(c.id)}">Modifier ma décision</button></div></div>`;
+      <div class="actions" style="border:0;margin-top:8px;padding:0"><button data-bc="${esc(c.id)}">${s.bc ? "Renvoyer un Business Case" : "Envoyer un Business Case"}</button><button data-top="${esc(c.id)}" ${rang >= 0 ? "disabled" : ""}>Ajouter au top 3</button><button data-annuler="${esc(c.id)}">Modifier ma décision</button></div></div>`;
   }
   return `<article class="carte ${s.d === "accepte" ? "accepte" : s.d === "refus" ? "refuse" : ""}" draggable="${s.d === "refus" ? "false" : "true"}" data-c="${esc(c.id)}">
    <div class="cl"><div><div class="nom">${esc(c.prenom)} ${esc(c.nom)}</div><div class="meta">${esc([c.residence, c.situation].filter(Boolean).join(" · "))}</div><div>${badges(c)}</div>${c.situation_projet ? `<div class="situation"><b>Situation qui décrit le mieux son projet</b>${esc(c.situation_projet)}</div>` : ""}</div>
@@ -336,6 +338,71 @@ function apercu(o, c) {
   };
 }
 
+
+/* ---------- business case ---------- */
+const BC_MAX = 14000;
+function mailBC(o, c, bc) {
+  const poste = o.poste, ent = D.nom, prenom = c.prenom, equipe = estEquipe(c);
+  const sign = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect<br>${EMAIL_RECRUTEMENT}</p>`;
+  const dl = bc.restitution.mode === "email" ? FRD(bc.restitution.deadline) : "";
+  const consigne = bc.enonce ? `<p style="white-space:pre-line;background:#F6EFEA;padding:10px 12px;border-radius:8px">${esc(bc.enonce)}</p>` : "";
+  const fichier = bc.fichier ? `<p>Le sujet est joint à cet e-mail : <b>${esc(bc.fichier.nom)}</b>.</p>` : (bc.lien ? `<p>Le sujet est disponible ici : <a href="${esc(bc.lien)}">${esc(bc.lien)}</a></p>` : "");
+  const rest = bc.restitution.mode === "email"
+    ? `<p><b>Restitution par e-mail</b> : merci d'envoyer votre travail à <b>${esc(bc.contact_nom ? bc.contact_nom + " (" + bc.contact + ")" : bc.contact)}</b>, avant le <b>${esc(dl)}</b>.</p>`
+    : `<p><b>Restitution orale</b> lors de l'entretien. Si vous utilisez un fichier support (présentation, tableur…), merci de l'envoyer à <b>${esc(bc.contact_nom ? bc.contact_nom + " (" + bc.contact + ")" : bc.contact)}</b> <b>au plus tard la veille de l'entretien (J-1)</b>.</p>`;
+  const debut = equipe
+    ? `<p>L'équipe Diaspora Connect a proposé votre profil à <b>${esc(ent)}</b> pour le poste <b>${esc(poste)}</b>. En plus de l'entretien, l'entreprise a ajouté à son processus de recrutement un <b>business case</b>.</p>`
+    : `<p>Suite à votre candidature au poste <b>${esc(poste)}</b> chez <b>${esc(ent)}</b> : en plus de l'entretien, l'entreprise a ajouté à son processus de recrutement un <b>business case</b>.</p>`;
+  return {de: EMAIL_RECRUTEMENT, a: prenom + " " + c.nom + " (adresse du dossier)", cc: bc.recruteur_email || "", objet: `Business case ${ent} : ${poste}`,
+    corps: `<p>Bonjour ${esc(prenom)},</p>${debut}<p>Voici le business case à préparer :</p>${consigne}${fichier}${rest}<p>Si vous avez une question sur le sujet ou sur les modalités, répondez simplement à cet e-mail.</p>${sign}`,
+    pj: bc.fichier ? {nom: bc.fichier.nom} : null};
+}
+const FRD = d => { try { const [y, m, j] = String(d).split("-"); return j + "/" + m + "/" + y; } catch (_) { return d || ""; } };
+function formulaireBC(o, c) {
+  const el = $("#modale"); el.hidden = false;
+  const s = ST.dec[kd(o, c)] || {}; const v = (s.bc_brouillon = s.bc_brouillon || {mode: "email"});
+  const dessiner = () => {
+    el.innerHTML = `<div class="fond"><div class="modale large"><h2 style="font-size:22px">Envoyer un Business Case à ${esc(c.prenom)} ${esc(c.nom)}</h2>
+     <p class="meta">${esc(D.nom)} · ${esc(o.poste)}. L'e-mail part de ${EMAIL_RECRUTEMENT}, avec le recruteur en copie, après votre confirmation.</p>
+     <label>Votre e-mail (recruteur, en copie)<input id="bc-rec" type="email" value="${esc(v.recruteur_email || "")}"></label>
+     <label>Énoncé du business case (écrivez-le ici)<textarea id="bc-enonce" rows="6" maxlength="4000" placeholder="Décrivez le cas, le contexte, les livrables attendus…">${esc(v.enonce || "")}</textarea></label>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>…ou ajoutez un fichier (PDF, Word, 10 Ko maximum)<input id="bc-fichier" type="file" accept=".pdf,.doc,.docx,.txt"></label><label>…ou un lien vers le sujet<input id="bc-lien" type="url" placeholder="https://" value="${esc(v.lien || "")}"></label></div>
+     ${v.fichier ? `<div class="meta">Fichier ajouté : <b>${esc(v.fichier.nom)}</b></div>` : ""}
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>Personne à qui le candidat renvoie son travail (nom)<input id="bc-cnom" value="${esc(v.contact_nom || "")}"></label><label>Son e-mail<input id="bc-cmail" type="email" value="${esc(v.contact || "")}"></label></div>
+     <div style="margin:8px 0 4px"><b>Mode de restitution</b></div>
+     <label class="opt ${v.mode === "email" ? "sel" : ""}"><input type="radio" name="bc-mode" value="email" ${v.mode === "email" ? "checked" : ""}><span>Restitution par e-mail</span></label>
+     <label class="opt ${v.mode === "oral" ? "sel" : ""}"><input type="radio" name="bc-mode" value="oral" ${v.mode === "oral" ? "checked" : ""}><span>Restitution orale lors de l'entretien (le fichier support éventuel est à envoyer au plus tard la veille, J-1)</span></label>
+     ${v.mode === "email" ? `<label>Deadline de restitution<input id="bc-dl" type="date" value="${esc(v.deadline || "")}"></label>` : ""}
+     <div id="bc-err" class="meta" style="color:#B00020;min-height:18px"></div>
+     <div style="display:flex;gap:10px;justify-content:flex-end"><button id="bc-x">Annuler</button><button class="prim" id="bc-ap">Voir l'e-mail</button></div></div></div>`;
+    const lire = () => { v.recruteur_email = $("#bc-rec").value.trim(); v.enonce = $("#bc-enonce").value; v.lien = $("#bc-lien").value.trim(); v.contact_nom = $("#bc-cnom").value.trim(); v.contact = $("#bc-cmail").value.trim(); if ($("#bc-dl")) v.deadline = $("#bc-dl").value; };
+    document.querySelectorAll("input[name=bc-mode]").forEach(r => r.onchange = () => { lire(); v.mode = r.value; dessiner(); });
+    $("#bc-fichier").onchange = ev => { const f = ev.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { const b64 = String(rd.result).split(",")[1] || ""; if (b64.length > BC_MAX) { lire(); $("#bc-err").textContent = "Ce fichier est trop lourd (10 Ko maximum). Collez plutôt un lien (Drive, Notion…) ou écrivez l'énoncé."; ev.target.value = ""; return; } lire(); v.fichier = {nom: f.name, type: f.type, b64}; dessiner(); }; rd.readAsDataURL(f); };
+    $("#bc-x").onclick = () => { el.hidden = true; };
+    $("#bc-ap").onclick = () => { lire(); const manque = [];
+      if (!/^\S+@\S+\.\S+$/.test(v.recruteur_email || "")) manque.push("votre e-mail (en copie)");
+      if (!(v.enonce || "").trim() && !v.fichier && !v.lien) manque.push("l'énoncé (texte, fichier ou lien)");
+      if (!/^\S+@\S+\.\S+$/.test(v.contact || "")) manque.push("l'e-mail de la personne qui reçoit le travail");
+      if (v.mode === "email" && !v.deadline) manque.push("la deadline");
+      if (manque.length) { $("#bc-err").textContent = "Merci de renseigner : " + manque.join(", ") + "."; return; }
+      apercuBC(o, c, v); };
+  };
+  dessiner();
+}
+function apercuBC(o, c, v) {
+  const bc = {enonce: v.enonce, lien: v.lien, fichier: v.fichier, contact: v.contact, contact_nom: v.contact_nom, recruteur_email: v.recruteur_email, restitution: {mode: v.mode, deadline: v.deadline}};
+  const m = mailBC(o, c, bc), el = $("#modale"), s = ST.dec[kd(o, c)];
+  el.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Aperçu de l'e-mail au candidat</h2><p class="meta">Voici exactement l'e-mail qui sera adressé au candidat. Une fois confirmé, il est transmis à l'équipe Diaspora Connect qui l'envoie depuis ${EMAIL_RECRUTEMENT}.</p>
+   <div class="mail"><div class="ent"><div><b>De :</b> ${esc(m.de)}</div><div><b>À :</b> ${esc(m.a)}</div><div><b>Copie :</b> ${esc(m.cc)}</div><div><b>Objet :</b> ${esc(m.objet)}</div>${m.pj ? `<div><b>Pièce jointe :</b> ${esc(m.pj.nom)}</div>` : ""}</div><div class="corps">${m.corps}</div></div>
+   <div style="display:flex;gap:10px;justify-content:flex-end"><button id="m-non">Modifier</button><button class="prim" id="m-oui">Confirmer cet e-mail</button></div></div></div>`;
+  $("#m-non").onclick = () => formulaireBC(o, c);
+  $("#m-oui").onclick = async () => {
+    $("#m-oui").disabled = true;
+    const r = await envoyer("business_case", {offre: o.id, candidat: c.id, objet: m.objet, restitution: bc.restitution, contact: bc.contact, mail: {de: m.de, a: m.a, cc: m.cc, objet: m.objet, corps: m.corps}, fichier: bc.fichier || null, lien: bc.lien || ""});
+    if (r && r.ok === false) return;
+    s.bc = {quand: new Date().toISOString(), objet: m.objet, restitution: bc.restitution}; delete s.bc_brouillon; sauver(); el.hidden = true; rendre();
+  };
+}
 /* ---------- interactions ---------- */
 function brancher(o, top) {
   document.querySelectorAll("details[data-dos]").forEach(d => d.addEventListener("toggle", () => { if (d.open) d.querySelectorAll("iframe[data-src]").forEach(f => { f.src = f.dataset.src; f.removeAttribute("data-src"); }); }));
@@ -348,6 +415,7 @@ function brancher(o, top) {
   tous("[data-retirer]", b => b.onclick = () => { top[+b.dataset.retirer] = null; majTop(o, top); });
   tous("input[type=radio][name^=m-]", r => r.onchange = () => { const c = parId[r.name.slice(2)]; ST.dec[kd(o, c)].plan = {mode: r.value}; sauver(); rendre(); });
   tous("[data-f]", i => i.oninput = () => { const c = parId[i.dataset.c]; ST.dec[kd(o, c)].plan[i.dataset.f] = i.value; sauver(); });
+  tous("[data-bc]", b => b.onclick = () => formulaireBC(o, parId[b.dataset.bc]));
   tous("[data-apercu]", b => b.onclick = () => apercu(o, parId[b.dataset.apercu]));
   tous("[data-lien-c]", a => a.addEventListener("click", () => {}));
   // glisser-déposer
@@ -402,11 +470,11 @@ async function chargerJournal() {
     else if (e.action === "ajout_retire") o.candidats = o.candidats.filter(x => x.id !== e.candidat); });
 }
 function etatEquipe() {
-  const dec = {}, mail = {}, top = {};
+  const dec = {}, mail = {}, bcs = {}, top = {};
   EV.forEach(e => { const k = e.entreprise + "|" + e.offre + "|" + e.candidat;
     if (e.action === "decision") { if (e.decision === "annulee") delete dec[k]; else dec[k] = e; }
-    else if (e.action === "email") mail[k] = e; else if (e.action === "top3") top[e.entreprise + "|" + e.offre] = e.classement || []; });
-  return {dec, mail, top};
+    else if (e.action === "email") mail[k] = e; else if (e.action === "business_case") bcs[k] = e; else if (e.action === "top3") top[e.entreprise + "|" + e.offre] = e.classement || []; });
+  return {dec, mail, bcs, top};
 }
 async function demarrerEquipe() {
   $("#vue-entree").hidden = true; $("#vue-equipe").hidden = false;
@@ -421,8 +489,8 @@ function rendreEquipe() {
   const S = etatEquipe();
   const lignes = [];
   D.entreprises.forEach(e => e.offres.forEach(o => o.candidats.forEach(c => {
-    const k = e.id + "|" + o.id + "|" + c.id, d = S.dec[k], m = S.mail[k], t = (S.top[e.id + "|" + o.id] || []).indexOf(c.id);
-    lignes.push({e, o, c, d, m, rang: t >= 0 ? t + 1 : 0}); })));
+    const k = e.id + "|" + o.id + "|" + c.id, d = S.dec[k], m = S.mail[k], bc = S.bcs[k], t = (S.top[e.id + "|" + o.id] || []).indexOf(c.id);
+    lignes.push({e, o, c, d, m, bc, rang: t >= 0 ? t + 1 : 0}); })));
   const el = $("#contenu-eq");
   if (ONG_EQ === "synthese") {
     const n = f => lignes.filter(f).length;
@@ -438,7 +506,7 @@ function rendreEquipe() {
       <table class="t"><tr><th>Candidat</th><th>Décision</th><th>Entretien</th><th>Top 3</th><th></th></tr>${lignes.filter(l => l.e.id === e.id && l.o.id === o.id).map(l => `<tr>
         <td><b>${esc(l.c.prenom)} ${esc(l.c.nom)}</b><div>${badges(l.c)}</div></td>
         <td>${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') + `<div class="meta">${FR(l.d.quand)}</div>` + (l.d.motif ? `<div class="meta"><b>Motif :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">À traiter</span>'}</td>
-        <td>${l.m ? `<span class="pastille v">${esc(LIB[l.m.mode] || l.m.mode)}</span><div class="meta">${FR(l.m.quand)}</div>` + (l.m.planification && l.m.planification.nom ? `<div class="meta">${esc(l.m.planification.nom)}${l.m.planification.fonction ? ", " + esc(l.m.planification.fonction) : ""}</div>` : "") : '<span class="meta">—</span>'}</td>
+        <td>${l.m ? `<span class="pastille v">${esc(LIB[l.m.mode] || l.m.mode)}</span><div class="meta">${FR(l.m.quand)}</div>` + (l.m.planification && l.m.planification.nom ? `<div class="meta">${esc(l.m.planification.nom)}${l.m.planification.fonction ? ", " + esc(l.m.planification.fonction) : ""}</div>` : "") : '<span class="meta">—</span>'}${l.bc ? `<div><span class="pastille v">Business case envoyé</span><div class="meta">${FR(l.bc.quand)} · ${esc(l.bc.restitution && l.bc.restitution.mode === "oral" ? "restitution orale" : "restitution par e-mail")}</div></div>` : ""}</td>
         <td>${l.rang ? `<span class="pastille v">N° ${l.rang}</span>` : '<span class="meta">—</span>'}</td>
         <td><button data-fiche="${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}">Voir le dossier</button> <button class=\"ko\" data-retirer-aj=\"${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}\" title=\"Retirer ce candidat de cette offre\">Retirer</button></td></tr>`).join("")}</table>`).join("")).join("");
   document.querySelectorAll("[data-ajout]").forEach(b => b.onclick = () => { const [ei, oi] = b.dataset.ajout.split("|"); ajouterManuel(D.entreprises.find(x => x.id === ei), oi); });
@@ -478,8 +546,9 @@ function journalHtml(L) {
     const qui = `<b>${esc(ent ? ent.nom : e.entreprise)}</b>`, cand = c ? `${esc(c.prenom)} ${esc(c.nom)}` : "", poste = o ? PN(o) : "";
     const txt = e.action === "decision" ? (e.decision === "accepte" ? `${qui} a accepté ${cand} (${poste})` : e.decision === "refus" ? `${qui} a refusé ${cand} (${poste}). Motif : ${esc(e.motif || "")}` : `${qui} a annulé sa décision pour ${cand} (${poste})`)
       : e.action === "email" ? `${qui} : e-mail d'entretien confirmé pour ${cand} (${poste}), ${esc(LIB[e.mode] || e.mode)}. À envoyer au candidat`
+      : e.action === "business_case" ? `${qui} : business case à envoyer à ${cand} (${poste}), ${e.restitution && e.restitution.mode === "oral" ? "restitution orale lors de l'entretien" : "restitution par e-mail"}. À envoyer au candidat`
       : e.action === "top3" ? `${qui} a classé son top 3 pour ${poste} : ` + (e.classement || []).map((id, i) => { const x = o && o.candidats.find(y => y.id === id); return x ? `${i + 1}. ${esc(x.prenom)} ${esc(x.nom)}` : ""; }).filter(Boolean).join(", ") : esc(e.action);
-    const mailv = e.action === "email" && e.mail ? `<details style="margin-top:6px"><summary>Voir l'e-mail à envoyer</summary><div class="meta" style="white-space:pre-line;margin-top:6px"><b>De :</b> ${esc(e.mail.de)}\n<b>À :</b> ${esc(e.mail.a)}${e.mail.cc ? "\n<b>Copie :</b> " + esc(e.mail.cc) : ""}\n<b>Objet :</b> ${esc(e.mail.objet)}\n\n${esc(String(e.mail.corps || "").replace(/<br\s*\/?>|<\/p>/gi, "\n").replace(/<[^>]+>/g, ""))}</div></details>` : "";
+    const mailv = (e.action === "email" || e.action === "business_case") && e.mail ? `<details style="margin-top:6px"><summary>Voir l'e-mail à envoyer</summary><div class="meta" style="white-space:pre-line;margin-top:6px"><b>De :</b> ${esc(e.mail.de)}\n<b>À :</b> ${esc(e.mail.a)}${e.mail.cc ? "\n<b>Copie :</b> " + esc(e.mail.cc) : ""}\n<b>Objet :</b> ${esc(e.mail.objet)}\n\n${esc(String(e.mail.corps || "").replace(/<br\s*\/?>|<\/p>/gi, "\n").replace(/<[^>]+>/g, ""))}</div>${e.fichier && e.fichier.b64 ? `<div style="margin-top:6px"><a class="btn" download="${esc(e.fichier.nom)}" href="data:${esc(e.fichier.type || "application/octet-stream")};base64,${esc(e.fichier.b64)}">Télécharger la pièce jointe : ${esc(e.fichier.nom)}</a></div>` : ""}</details>` : "";
     return `<div class="jr"><time>${e.quand === "9999" ? "récent" : FR(e.quand)}</time><div>${txt}${mailv}</div></div>`; }).join("");
 }
 function exporterCsv(lignes) {
