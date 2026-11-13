@@ -161,8 +161,10 @@ async function ouvrir(code) {
   if (CONFIG.demo && CONFIG.demo[net]) return {data: CONFIG.demo[net], cle: "demo-" + CONFIG.demo[net].id};   // démonstration : données fictives, lisibles partout
   if (!(window.crypto && crypto.subtle)) throw new Error("securite");
   const k = await deriver(norm(code));
-  const blob = BLOBS[k.tag];
-  if (!blob) throw new Error("code");
+  const np = BLOBS[k.tag];
+  if (!np) throw new Error("code");
+  let blob = "";
+  for (let i = 0; i < np; i++) { const rr = await fetch("blobs/" + k.tag + "." + i + ".txt"); if (!rr.ok) throw new Error("reseau"); blob += (await rr.text()).slice(1); }
   const raw = b64(blob);
   const key = await crypto.subtle.importKey("raw", k.aes, "AES-GCM", false, ["decrypt"]);
   const clair = await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, key, raw.slice(12));
