@@ -277,7 +277,9 @@ function dossierHtml(c, direct) {
 const genreCls = g => /^f/i.test(g || "") ? "f" : /^(h|m)/i.test(g || "") ? "h" : "n";
 const noteMoy = c => { const v = Object.values(c.notes || {}).map(Number).filter(x => x > 0); return v.length ? (v.reduce((a, b) => a + b, 0) / v.length) : null; };
 const noteTxt = c => { const m = noteMoy(c); return m === null ? "" : (Math.round(m * 10) / 10).toString().replace(".", ","); };
-const badges = c => (c.reserve ? '<span class="badge" style="background:#FFF1D6;color:#8A5A00">Avec réserve</span>' : "") + (c.manuel ? '<span class="badge manuel">Ajout manuel</span>' : "") + (c.genre ? `<span class="badge ${genreCls(c.genre)}">${esc(c.genre)}</span>` : "") + `<span class="badge n">Dossier n° ${esc(c.id)}</span>` + (noteTxt(c) ? `<span class="badge s" title="Moyenne des cinq notes de l'entretien de découverte, sur 5">Note : ${noteTxt(c)}/5</span>` : `<span class="badge s" title="Pas d'entretien de découverte à ce jour">Non évalué</span>`);
+const estEquipe = c => c.origine === "equipe" || !!c.manuel;
+const badgeOrigine = c => estEquipe(c) ? '<span class="badge" style="background:#EFE3F6;color:#6E2C90">Proposition de l\'équipe</span>' : '<span class="badge" style="background:#E2F3E7;color:#1E6B3A">Candidature du candidat</span>';
+const badges = c => badgeOrigine(c) + (c.reserve ? '<span class="badge" style="background:#FFF1D6;color:#8A5A00">Avec réserve</span>' : "") + (c.manuel ? '<span class="badge manuel">Ajout manuel</span>' : "") + (c.genre ? `<span class="badge ${genreCls(c.genre)}">${esc(c.genre)}</span>` : "") + `<span class="badge n">Dossier n° ${esc(c.id)}</span>` + (noteTxt(c) ? `<span class="badge s" title="Moyenne des cinq notes de l'entretien de découverte, sur 5">Note : ${noteTxt(c)}/5</span>` : `<span class="badge s" title="Pas d'entretien de découverte à ce jour">Non évalué</span>`);
 const LIB = {candidat: "lien de réservation du candidat", recruteur: "votre lien de réservation", manuel: "disponibilités à communiquer"};
 
 function planif(o, c) {
@@ -299,16 +301,19 @@ function monMail(o, c, p, mode) {
   const bonjour = `<p>Bonjour ${esc(prenom)},</p>`;
   const offres = `<p>Pour vous préparer, vous pouvez revoir les offres ici : <a href="${URL_OFFRES}">${URL_OFFRES}</a></p>`;
   const sign = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect<br>${EMAIL_RECRUTEMENT}</p>`;
+  const equipe = estEquipe(c);
+  const intro = equipe ? `<p>L'équipe Diaspora Connect a proposé votre profil à l'entreprise d'accueil <b>${esc(ent)}</b> pour le poste <b>${esc(poste)}</b>, une offre sur laquelle vous n'aviez pas candidaté. L'entreprise est intéressée par votre profil et souhaiterait échanger avec vous.</p><p>Si vous acceptez cette proposition, voici la suite :</p>` : "";
+  const sortie = equipe ? `<p>Si cette offre ne vous correspond pas, répondez simplement à cet e-mail : vous n'avez aucune obligation et votre dossier reste actif pour les autres offres du programme.</p>` : "";
   let objet, corps;
   if (mode === "candidat") {
     objet = `Entretien ${ent} : merci de vérifier votre rendez-vous (${poste})`;
-    corps = `${bonjour}<p>Bonne nouvelle : le recruteur de l'offre <b>${esc(poste)}</b> de l'entreprise <b>${esc(ent)}</b> a pris un rendez-vous sur votre agenda de réservation.</p>${infos}<p>Merci de vérifier que vous voyez bien ce rendez-vous dans votre calendrier et que vous l'avez bien accepté. S'il n'apparaît pas, répondez simplement à cet e-mail.</p>${offres}${sign}`;
+    corps = `${bonjour}${intro}<p>${equipe ? "Le" : "Bonne nouvelle : le"} recruteur de l'offre <b>${esc(poste)}</b> de l'entreprise <b>${esc(ent)}</b> a pris un rendez-vous sur votre agenda de réservation.</p>${infos}<p>Merci de vérifier que vous voyez bien ce rendez-vous dans votre calendrier et que vous l'avez bien accepté. S'il n'apparaît pas, répondez simplement à cet e-mail.</p>${sortie}${offres}${sign}`;
   } else if (mode === "recruteur") {
     objet = `Entretien ${ent} : réservez votre créneau (${poste})`;
-    corps = `${bonjour}<p>${esc(ent)} souhaite échanger avec vous pour l'offre <b>${esc(poste)}</b>. Merci de réserver dès que possible un créneau d'entretien sur l'agenda du recruteur :</p>${infos}<p><a href="${esc(p.lien)}">${esc(p.lien)}</a></p>${offres}${sign}`;
+    corps = `${bonjour}${intro}<p>${equipe ? "Dans ce cas, merci de réserver" : esc(ent) + " souhaite échanger avec vous pour l'offre <b>" + esc(poste) + "</b>. Merci de réserver"} dès que possible un créneau d'entretien sur l'agenda du recruteur :</p>${infos}<p><a href="${esc(p.lien)}">${esc(p.lien)}</a></p>${sortie}${offres}${sign}`;
   } else {
     objet = `Entretien ${ent} : vos disponibilités (${poste})`;
-    corps = `${bonjour}<p>${esc(ent)} souhaite échanger avec vous pour l'offre <b>${esc(poste)}</b>. Voici les disponibilités proposées par le recruteur :</p>${infos}<p style="white-space:pre-line;background:#F6EFEA;padding:10px 12px;border-radius:8px">${esc(p.dispos)}</p><p><b>Merci de répondre à cet e-mail</b> en indiquant le créneau qui vous convient ou, à défaut, vos propres disponibilités.</p>${offres}${sign}`;
+    corps = `${bonjour}${intro}<p>${equipe ? "Voici" : esc(ent) + " souhaite échanger avec vous pour l'offre <b>" + esc(poste) + "</b>. Voici"} les disponibilités proposées par le recruteur :</p>${infos}<p style="white-space:pre-line;background:#F6EFEA;padding:10px 12px;border-radius:8px">${esc(p.dispos)}</p><p><b>Merci de répondre à cet e-mail</b> en indiquant le créneau qui vous convient ou, à défaut, vos propres disponibilités.</p>${sortie}${offres}${sign}`;
   }
   return {de: EMAIL_RECRUTEMENT, a: prenom + " " + c.nom + " (adresse du dossier)", cc: p.email || "", objet, corps};
 }
@@ -393,7 +398,7 @@ async function chargerJournal() {
   }
   EV = ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
   if (CONFIG.tally) EV.forEach(e => { const en = D.entreprises.find(x => x.id === e.entreprise), o = en && en.offres.find(x => x.id === e.offre); if (!o) return;
-    if (e.action === "ajout") { const c = poolCand().find(x => x.id === e.candidat); if (c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false})); }
+    if (e.action === "ajout") { const c = poolCand().find(x => x.id === e.candidat); if (c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); }
     else if (e.action === "ajout_retire") o.candidats = o.candidats.filter(x => x.id !== e.candidat); });
 }
 function etatEquipe() {
@@ -406,7 +411,7 @@ function etatEquipe() {
 async function demarrerEquipe() {
   $("#vue-entree").hidden = true; $("#vue-equipe").hidden = false;
   $("#contenu-eq").innerHTML = '<div class="vide">Chargement…</div>';
-  lireAjouts().forEach(a => { const e = D.entreprises.find(x => x.id === a.entreprise), o = e && e.offres.find(x => x.id === a.offre), c = poolCand().find(x => x.id === a.candidat); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false})); });
+  lireAjouts().forEach(a => { const e = D.entreprises.find(x => x.id === a.entreprise), o = e && e.offres.find(x => x.id === a.offre), c = poolCand().find(x => x.id === a.candidat); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); });
   await chargerJournal(); rendreEquipe();
 }
 function rendreEquipe() {
@@ -510,7 +515,7 @@ function ajouterManuel(e, offreId) {
     $("#aj-res").innerHTML = L.length ? L.map(c => `<div class="jr" style="align-items:center"><div style="flex:1"><b>${esc(c.prenom)} ${esc(c.nom)}</b><div>${badges(c)}</div><div class="meta">${esc([c.residence, c.situation].filter(Boolean).join(" · "))}</div></div><button class="prim" data-aj="${esc(c.id)}">Ajouter</button></div>`).join("") : '<div class="vide">Aucun candidat trouvé.</div>';
     document.querySelectorAll("[data-aj]").forEach(b => b.onclick = () => { const c = poolCand().find(x => x.id === b.dataset.aj);
       const A = lireAjouts(); A.push({entreprise: e.id, offre: offreId, candidat: c.id}); localStorage.setItem("dc-ajouts", JSON.stringify(A));
-      o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; rendreEquipe(); }); };
+      o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; rendreEquipe(); }); };
   $("#aj-q").oninput = liste; liste(); $("#aj-x").onclick = () => { m.hidden = true; };
 }
 </script></body></html>
