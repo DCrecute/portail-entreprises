@@ -121,6 +121,7 @@ const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8":
 const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": null, "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
+const SIGNATURE_MAIL = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect</p><p style="margin:0">&nbsp;</p><table style="border-collapse:collapse"><tr><td style="padding-right:16px;vertical-align:middle"><b>Miryam Matinua</b><br><i>Responsable Recrutement &amp; Coordination | Diaspora Connect</i><br>Fondation MStudio<br><a href="mailto:recrutement@diaspora-connect.africa">recrutement@diaspora-connect.africa</a></td><td style="vertical-align:middle"><img src="https://www.diaspora-connect.africa/assets/marque/logo-tagline-color.png" alt="Diaspora Connect" height="46" style="margin-right:10px"> <img src="https://raw.githubusercontent.com/leslita06/dc-signature-logos-q7w2/main/logo-mstudio.png" alt="MStudio" height="46"></td></tr></table>`;
 const $ = s => document.querySelector(s);
 const PN = o => esc(o.poste) + (o.annule ? ' <span class="annule">(ANNULÉ)</span>' : "");
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -303,7 +304,7 @@ function monMail(o, c, p, mode) {
   const infos = `<ul><li>Poste : <b>${esc(poste)}</b></li><li>Entreprise : <b>${esc(ent)}</b></li>${o.contrat ? `<li>Contrat : ${esc(o.contrat)}</li>` : ""}${p.nom ? `<li>Recruteur : <b>${esc(p.nom)}</b>${p.fonction ? ", " + esc(p.fonction) : ""}</li>` : ""}</ul>`;
   const bonjour = `<p>Bonjour ${esc(prenom)},</p>`;
   const offres = `<p>Pour vous préparer, vous pouvez revoir les offres ici : <a href="${URL_OFFRES}">${URL_OFFRES}</a></p>`;
-  const sign = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect<br>${EMAIL_RECRUTEMENT}</p>`;
+  const sign = SIGNATURE_MAIL;
   const equipe = estEquipe(c);
   const intro = equipe ? `<p>L'équipe Diaspora Connect a proposé votre profil à l'entreprise d'accueil <b>${esc(ent)}</b> pour le poste <b>${esc(poste)}</b>, une offre sur laquelle vous n'aviez pas candidaté. L'entreprise est intéressée par votre profil et souhaiterait échanger avec vous.</p><p>Si vous acceptez cette proposition, voici la suite :</p>` : "";
   const sortie = equipe ? `<p>Si cette offre ne vous correspond pas, répondez simplement à cet e-mail : vous n'avez aucune obligation et votre dossier reste actif pour les autres offres du programme.</p>` : "";
@@ -344,7 +345,7 @@ function apercu(o, c) {
 const BC_MAX = 14000;
 function mailBC(o, c, bc) {
   const poste = o.poste, ent = D.nom, prenom = c.prenom, equipe = estEquipe(c);
-  const sign = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect<br>${EMAIL_RECRUTEMENT}</p>`;
+  const sign = SIGNATURE_MAIL;
   const dl = bc.restitution.mode === "email" ? FRD(bc.restitution.deadline) : "";
   const consigne = bc.enonce ? `<p style="white-space:pre-line;background:#F6EFEA;padding:10px 12px;border-radius:8px">${esc(bc.enonce)}</p>` : "";
   const fichier = bc.fichier ? `<p>Le sujet est joint à cet e-mail : <b>${esc(bc.fichier.nom)}</b>.</p>` : (bc.lien ? `<p>Le sujet est disponible ici : <a href="${esc(bc.lien)}">${esc(bc.lien)}</a></p>` : "");
