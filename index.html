@@ -99,7 +99,7 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
   <div class="droite"><a class="btn" href="https://www.diaspora-connect.africa/offres-off.html" target="_blank" rel="noopener">Revoir les offres</a><button id="bt-sortir">Se déconnecter</button></div></header>
  <main>
   <h1 style="font-size:30px">Vos candidats sélectionnés</h1>
-  <p class="meta">Pour chaque candidat : acceptez ou refusez la candidature, choisissez comment planifier l'entretien, puis classez votre top 3 par offre. Vos choix sont enregistrés au fur et à mesure.</p>
+  <div class="zone" style="margin:12px 0"><b>Comment ça marche, en 3 étapes</b><ol style="margin:6px 0 0 18px;padding:0"><li><b>Accepter le dossier</b> : cliquer sur « Accepter le dossier » signifie que vous souhaitez rencontrer le candidat en entretien (ou « Refuser le dossier », avec un motif).</li><li><b>Planifier l'entretien</b> : une fois le dossier accepté, choisissez le mode de planification. Tant que ce choix n'est pas fait, le candidat n'est pas contacté.</li><li><b>Classer votre top 3</b> par offre.</li></ol><div style="margin-top:8px"><b>Recommandé :</b> envoyez aussi un <b>Business Case</b> au candidat (bouton « Envoyer un Business Case » sur sa carte) pour juger sa façon de travailler.</div><div class="meta" style="margin-top:6px">Vos choix sont enregistrés au fur et à mesure.</div></div>
   <div class="onglets" id="onglets"></div>
   <div id="offre"></div>
  </main>
@@ -117,8 +117,8 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
 <div id="modale" hidden></div>
 
 <script>
-const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8": 1, "089e19f9e9924a06": 1, "b7f850414ee1b9f2": 1, "be77e50db46360ac": 1, "32593ffe7901aa8d": 1, "4e43c978488dc918": 1, "fb0c39441cd0fae6": 1, "5c4f65c1090fd558": 1, "57bbda22d81abfd7": 1, "c0abaf7e7ddb05f4": 1, "8bce3cbb806b3358": 1, "0c42a3e1628f72c4": 1, "ac91af3adecdb972": 1, "e386478a072db1bf": 1, "5b5eb2eb883b7b57": 1, "d2ab86268c6eb377": 1, "3d58c7d31d6ea8f9": 1, "820bc30ffc26cac9": 1, "6cf264e9456e43a5": 1, "776a27a4b6d97862": 1, "e1cd5757ee624404": 1, "fff0cf913e39134b": 1, "6cc876d6f2af72d1": 1, "9d51620be523e3fe": 1, "d21c718da6cfa0e3": 1, "88453fb625d8fd61": 1, "dd01672918a050ee": 1, "e53bffb3af461385": 1, "448a2f33f780dc57": 1, "529e602154481459": 1, "8b8bcfd544692d88": 1, "7188b0c945a7a3ee": 1, "53c57214ad6f3bb7": 1, "8475717e0a13eb66": 1, "4abe3c4da0eab5f4": 1, "7c09c6e012da205d": 1, "8fc6c336f871a822": 1, "464b296f3dd7efb5": 1, "8dc431acf2f3c688": 1, "43d37e7da7f95106": 1, "6d05e63f4de05004": 1, "1b72f64e85dc0da8": 1, "b4e9dbcdebc07fe7": 1, "d07627950f4a23bc": 1, "4d6261d164a1059c": 1, "a3cc7832123a8792": 23};
-const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": {"form": "QoexV1", "groupe": "ba76939d-b9ee-449c-9ca3-862f154499cc", "champs": {"cle": "feae75cf-e795-4818-89e2-4a5b9c99471b", "entreprise": "93521726-6d8c-4503-9fb5-c4e1760f5f9e", "action": "081960ed-5654-4af4-94dd-cf3b9c8f6ba4", "offre": "747b4b01-70e0-4057-aaa3-4189887721d3", "candidat": "59883db7-898f-4876-9342-02992566fe6c", "decision": "01d86b74-d624-45c7-b17a-3687818a1245", "motif": "c109fa0f-cef0-4d80-b928-e407454e32c2", "donnees": "d627d1ca-942b-413d-bdd7-5c69cedfa3bd"}}, "apercu": false, "journal": [], "vivier_demo": []};
+const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8": 1, "089e19f9e9924a06": 1, "b7f850414ee1b9f2": 1, "be77e50db46360ac": 1, "32593ffe7901aa8d": 1, "4e43c978488dc918": 1, "fb0c39441cd0fae6": 1, "5c4f65c1090fd558": 1, "57bbda22d81abfd7": 1, "c0abaf7e7ddb05f4": 1, "8bce3cbb806b3358": 1, "0c42a3e1628f72c4": 1, "ac91af3adecdb972": 1, "e386478a072db1bf": 1, "5b5eb2eb883b7b57": 1, "d2ab86268c6eb377": 1, "3d58c7d31d6ea8f9": 1, "820bc30ffc26cac9": 1, "6cf264e9456e43a5": 1, "776a27a4b6d97862": 1, "e1cd5757ee624404": 1, "fff0cf913e39134b": 1, "6cc876d6f2af72d1": 1, "9d51620be523e3fe": 1, "d21c718da6cfa0e3": 1, "88453fb625d8fd61": 1, "dd01672918a050ee": 1, "e53bffb3af461385": 1, "448a2f33f780dc57": 1, "529e602154481459": 1, "8b8bcfd544692d88": 1, "7188b0c945a7a3ee": 1, "53c57214ad6f3bb7": 1, "8475717e0a13eb66": 1, "4abe3c4da0eab5f4": 1, "7c09c6e012da205d": 1, "8fc6c336f871a822": 1, "464b296f3dd7efb5": 1, "8dc431acf2f3c688": 1, "43d37e7da7f95106": 1, "6d05e63f4de05004": 1, "1b72f64e85dc0da8": 1, "b4e9dbcdebc07fe7": 1, "d07627950f4a23bc": 1, "4d6261d164a1059c": 1, "a3cc7832123a8792": 21};
+const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": null, "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
 const SIGNATURE_MAIL = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect</p><p style="margin:0">&nbsp;</p><table style="border-collapse:collapse"><tr><td style="padding-right:16px;vertical-align:middle"><b>Miryam Matinua</b><br><i>Responsable Recrutement &amp; Coordination | Diaspora Connect</i><br>Fondation MStudio<br><a href="mailto:recrutement@diaspora-connect.africa">recrutement@diaspora-connect.africa</a></td><td style="vertical-align:middle"><img src="https://www.diaspora-connect.africa/assets/marque/logo-tagline-color.png" alt="Diaspora Connect" height="46" style="margin-right:10px"> <img src="https://raw.githubusercontent.com/leslita06/dc-signature-logos-q7w2/main/logo-mstudio.png" alt="MStudio" height="46"></td></tr></table>`;
@@ -224,8 +224,8 @@ const offre = () => D.offres.find(o => o.id === offreCourante);
 
 function rendre() {
   $("#onglets").innerHTML = D.offres.map(o => {
-    const n = o.candidats.length, a = o.candidats.filter(c => (ST.dec[kd(o, c)] || {}).d).length;
-    return `<button class="${o.id === offreCourante ? "actif" : ""}" data-o="${esc(o.id)}">${PN(o)} <span class="meta" style="color:inherit;opacity:.7">· ${a}/${n} traité${a > 1 ? "s" : ""}</span></button>`;
+    const n = o.candidats.length, a = o.candidats.filter(c => (ST.dec[kd(o, c)] || {}).d).length, ap = o.candidats.filter(c => { const s = ST.dec[kd(o, c)] || {}; return s.d === "accepte" && !s.entretien; }).length;
+    return `<button class="${o.id === offreCourante ? "actif" : ""}" data-o="${esc(o.id)}">${PN(o)} <span class="meta" style="color:inherit;opacity:.7">· ${a}/${n} traité${a > 1 ? "s" : ""}</span>${ap ? `<span class="pastille" style="background:#FFF3C4;color:#6a5000;margin-left:6px">${ap} entretien${ap > 1 ? "s" : ""} à planifier</span>` : ""}</button>`;
   }).join("");
   document.querySelectorAll("#onglets button").forEach(b => b.onclick = () => { offreCourante = b.dataset.o; rendre(); });
   const o = offre();
@@ -240,6 +240,7 @@ function rendre() {
   $("#offre").innerHTML = `
    <div class="offre-tete"><div><h2>${PN(o)}</h2><div class="sub">${esc(o.contrat || "")}${o.contrat && o.lieu ? " · " : ""}${esc(o.lieu || "")} · ${o.candidats.length} candidat${o.candidats.length > 1 ? "s" : ""} sélectionné${o.candidats.length > 1 ? "s" : ""}</div></div>
     <a class="btn" style="margin-left:auto" href="${URL_OFFRES}" target="_blank" rel="noopener">Revoir l'offre et se préparer</a></div>
+   ${(() => { const ap = o.candidats.filter(c => { const s = ST.dec[kd(o, c)] || {}; return s.d === "accepte" && !s.entretien; }).length; return ap ? `<div style="margin:10px 0;padding:10px 14px;background:#FFF3C4;color:#6a5000;border-radius:8px"><b>${ap} dossier${ap > 1 ? "s" : ""} accepté${ap > 1 ? "s" : ""}, entretien à planifier.</b> Choisissez le mode de planification sur chaque carte concernée, sinon le candidat n'est pas contacté.</div>` : ""; })()}
    <div class="top3"><h3>Votre top 3</h3><div class="aide">Glissez-déposez les candidats retenus dans l'ordre de votre préférence (ou utilisez « Ajouter au top 3 » sur la carte).</div>
     <div class="slots">${[0, 1, 2].map(slot).join("")}</div></div>
    ${o.candidats.map(c => carte(o, c, top)).join("") || '<div class="vide">Aucun candidat partagé pour cette offre pour l\'instant.</div>'}`;
@@ -251,19 +252,19 @@ function carte(o, c, top) {
   const notes = NOTES.filter(n => c.notes && c.notes[n[0]]).map(n => `<div><span>${n[1]}</span>${etoiles(c.notes[n[0]])}</div>`).join("");
   let bas = "";
   if (!s.d) {
-    bas = `<div class="actions"><button class="ok" data-acc="${esc(c.id)}">Accepter la candidature</button><button class="ko" data-ref="${esc(c.id)}">Refuser la candidature</button>
+    bas = `<div class="actions"><button class="ok" data-acc="${esc(c.id)}">Accepter le dossier</button><button class="ko" data-ref="${esc(c.id)}">Refuser le dossier</button>
       <button data-bc="${esc(c.id)}">${s.bc ? "Renvoyer un Business Case" : "Envoyer un Business Case"}</button><button data-top="${esc(c.id)}" ${rang >= 0 ? "disabled" : ""}>Ajouter au top 3</button></div>${s.bc ? `<span class="pastille v">Business case : ${esc(s.bc.restitution && s.bc.restitution.mode === "oral" ? "restitution orale" : "restitution par e-mail")}, e-mail enregistré</span>` : ""}`;
   } else if (s.d === "refus") {
-    bas = `<div class="zone"><b>Candidature refusée.</b><div class="meta">Motif : ${esc(s.motif)}</div><button style="margin-top:8px" data-annuler="${esc(c.id)}">Modifier ma décision</button></div>`;
+    bas = `<div class="zone"><b>Dossier refusé.</b><div class="meta">Motif : ${esc(s.motif)}</div><button style="margin-top:8px" data-annuler="${esc(c.id)}">Modifier ma décision</button></div>`;
   } else {
-    bas = `<div class="zone"><b>Candidature acceptée.</b> ${s.entretien ? `<span class="pastille v">Entretien : ${esc(LIB[s.entretien.mode])}, e-mail envoyé au candidat, vous êtes en copie</span>` : ""}
+    bas = `<div class="zone"><b>Dossier accepté.</b> ${s.entretien ? `<span class="pastille v">Entretien : ${esc(LIB[s.entretien.mode])}, e-mail envoyé au candidat, vous êtes en copie</span>` : ""}
       ${s.bc ? `<span class="pastille v">Business case : ${esc(s.bc.restitution && s.bc.restitution.mode === "oral" ? "restitution orale" : "restitution par e-mail")}, e-mail envoyé au candidat, vous êtes en copie</span>` : ""}
-      ${s.entretien ? "" : planif(o, c)}
+      ${s.entretien ? "" : '<div style="margin:8px 0;padding:8px 12px;background:#FFF3C4;color:#6a5000;border-radius:8px;font-size:14px"><b>Étape 2 sur 3 : à faire maintenant.</b> Choisissez ci-dessous comment planifier l\'entretien. Sans ce choix, le candidat n\'est pas contacté. <b>Recommandé :</b> envoyez aussi un Business Case.</div>' + planif(o, c)}
       <div class="actions" style="border:0;margin-top:8px;padding:0"><button data-bc="${esc(c.id)}">${s.bc ? "Renvoyer un Business Case" : "Envoyer un Business Case"}</button><button data-top="${esc(c.id)}" ${rang >= 0 ? "disabled" : ""}>Ajouter au top 3</button><button data-annuler="${esc(c.id)}">Modifier ma décision</button></div></div>`;
   }
   return `<article class="carte ${s.d === "accepte" ? "accepte" : s.d === "refus" ? "refuse" : ""}" draggable="${s.d === "refus" ? "false" : "true"}" data-c="${esc(c.id)}">
    <div class="cl"><div><div class="nom">${esc(c.prenom)} ${esc(c.nom)}</div><div class="meta">${esc([c.residence, c.situation].filter(Boolean).join(" · "))}</div><div>${badges(c)}</div>${c.situation_projet ? `<div class="situation"><b>Situation qui décrit le mieux son projet</b>${esc(c.situation_projet)}</div>` : ""}</div>
-    <div style="margin-left:auto">${rang >= 0 ? `<span class="pastille v">Top 3 · n° ${rang + 1}</span>` : ""}${s.d === "accepte" ? '<span class="pastille v">Acceptée</span>' : s.d === "refus" ? '<span class="pastille g">Refusée</span>' : '<span class="pastille">À traiter</span>'}</div></div>
+    <div style="margin-left:auto">${rang >= 0 ? `<span class="pastille v">Top 3 · n° ${rang + 1}</span>` : ""}${s.d === "accepte" ? '<span class="pastille v">Accepté</span>' : s.d === "refus" ? '<span class="pastille g">Refusé</span>' : '<span class="pastille">À traiter</span>'}</div></div>
    ${notes ? `<div class="notes" title="Notation de l'entretien de découverte">${notes}</div>` : ""}
    <details data-dos><summary style="cursor:pointer;color:var(--violet);font-weight:500">Voir le dossier</summary>${dossierHtml(c)}</details>
    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${c.cv ? `<a class="btn" href="${esc(c.cv)}" target="_blank" rel="noopener">CV</a>` : ""}${c.linkedin ? `<a class="btn" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}</div>
@@ -497,7 +498,7 @@ function rendreEquipe() {
   if (ONG_EQ === "synthese") {
     const n = f => lignes.filter(f).length;
     el.innerHTML = `<div class="kpis">${[["Entreprises", D.entreprises.length], ["Candidats partagés", lignes.length], ["Acceptés", n(l => l.d && l.d.decision === "accepte")], ["Refusés", n(l => l.d && l.d.decision === "refus")],
-      ["À traiter", n(l => !l.d)], ["E-mails d'entretien envoyés", n(l => l.m)], ["Candidats en top 3", n(l => l.rang)]].map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+      ["À traiter", n(l => !l.d)], ["Acceptés, entretien à planifier", n(l => l.d && l.d.decision === "accepte" && !l.m)], ["E-mails d'entretien envoyés", n(l => l.m)], ["Candidats en top 3", n(l => l.rang)]].map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
       <h3 style="margin:18px 0 8px">Dernières actions</h3>${journalHtml(EV.slice(-8).reverse())}`;
     return;
   }
@@ -507,7 +508,7 @@ function rendreEquipe() {
     D.entreprises.filter(e => !FILTRE_EQ || e.id === FILTRE_EQ).map(e => `<h2 style="font-size:22px;margin:22px 0 8px">${esc(e.nom)}</h2>` + e.offres.map(o => `<div style="display:flex;align-items:center;gap:12px;margin:10px 0 6px"><h3>${PN(o)}</h3><button data-ajout="${esc(e.id)}|${esc(o.id)}">+ Ajouter un candidat</button></div>
       <table class="t"><tr><th>Candidat</th><th>Décision</th><th>Entretien</th><th>Top 3</th><th></th></tr>${lignes.filter(l => l.e.id === e.id && l.o.id === o.id).map(l => `<tr>
         <td><b>${esc(l.c.prenom)} ${esc(l.c.nom)}</b><div>${badges(l.c)}</div></td>
-        <td>${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') + `<div class="meta">${FR(l.d.quand)}</div>` + (l.d.motif ? `<div class="meta"><b>Motif :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">À traiter</span>'}</td>
+        <td>${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Accepté</span>' : '<span class="pastille g">Refusé</span>') + `<div class="meta">${FR(l.d.quand)}</div>` + (l.d.motif ? `<div class="meta"><b>Motif :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">À traiter</span>'}</td>
         <td>${l.m ? `<span class="pastille v">${esc(LIB[l.m.mode] || l.m.mode)}</span><div class="meta">${FR(l.m.quand)}</div>` + (l.m.planification && l.m.planification.nom ? `<div class="meta">${esc(l.m.planification.nom)}${l.m.planification.fonction ? ", " + esc(l.m.planification.fonction) : ""}</div>` : "") : '<span class="meta">—</span>'}${l.bc ? `<div><span class="pastille v">Business case envoyé</span><div class="meta">${FR(l.bc.quand)} · ${esc(l.bc.restitution && l.bc.restitution.mode === "oral" ? "restitution orale" : "restitution par e-mail")}</div></div>` : ""}</td>
         <td>${l.rang ? `<span class="pastille v">N° ${l.rang}</span>` : '<span class="meta">—</span>'}</td>
         <td><button data-fiche="${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}">Voir le dossier</button> <button class=\"ko\" data-retirer-aj=\"${esc(e.id)}|${esc(o.id)}|${esc(l.c.id)}\" title=\"Retirer ce candidat de cette offre\">Retirer</button></td></tr>`).join("")}</table>`).join("")).join("");
@@ -528,7 +529,7 @@ function rendreCandidats(lignes, S) {
   const tot = L.length, n0 = L.filter(x => !x.pl.length).length, n1 = L.filter(x => x.pl.length === 1).length, n2 = L.filter(x => x.pl.length > 1).length;
   const q = norm(Q_CAND);
   L = L.filter(x => (F_CAND === "tous" || (F_CAND === "0" && !x.pl.length) || (F_CAND === "1" && x.pl.length >= 1) || (F_CAND === "2" && x.pl.length >= 2)) && (!q || norm(x.c.prenom + " " + x.c.nom + " " + x.c.id + " " + x.pl.map(p => p.e.nom + " " + p.o.poste).join(" ")).includes(q)));
-  const stat = p => p.d ? (p.d.decision === "accepte" ? '<span class="pastille v">Acceptée</span>' : '<span class="pastille g">Refusée</span>') : '<span class="pastille">À traiter</span>';
+  const stat = p => p.d ? (p.d.decision === "accepte" ? '<span class="pastille v">Accepté</span>' : '<span class="pastille g">Refusé</span>') : '<span class="pastille">À traiter</span>';
   const notif = x => `<span class="pastille ${x.pl.length ? "v" : "g"}" title="Nombre d'entreprises où il est shortlisté" style="font-weight:700;min-width:28px;text-align:center">${x.pl.length}</span>`;
   const el = $("#contenu-eq");
   el.innerHTML = `<div class="kpis">${[["Candidats au total", tot], ["Shortlistés chez 1 entreprise", n1], ["Shortlistés chez 2 ou plus", n2], ["Aucune entreprise", n0]].map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
@@ -536,7 +537,7 @@ function rendreCandidats(lignes, S) {
    <select id="f-cand"><option value="tous" ${F_CAND === "tous" ? "selected" : ""}>Tous les candidats</option><option value="1" ${F_CAND === "1" ? "selected" : ""}>Shortlistés (1 entreprise ou plus)</option><option value="2" ${F_CAND === "2" ? "selected" : ""}>Shortlistés chez 2 ou plus</option><option value="0" ${F_CAND === "0" ? "selected" : ""}>Aucune entreprise</option></select></div>
    <p class="meta">${L.length} candidat${L.length > 1 ? "s" : ""} affiché${L.length > 1 ? "s" : ""}.</p>
    <table class="t"><tr><th>Candidat</th><th>Shortlist</th><th>Entreprises et offres</th><th></th></tr>${L.map(x => `<tr><td><b>${esc(x.c.prenom)} ${esc(x.c.nom)}</b><div class="meta">Dossier ${esc(x.c.id)}</div></td><td>${notif(x)}</td>
-   <td>${x.pl.length ? x.pl.map(p => `<div style="margin:2px 0"><b>${esc(p.e.nom)}</b> · ${PN(p.o)} ${stat(p)}${p.rang ? `<span class="pastille v">Top ${p.rang}</span>` : ""}${p.m ? '<span class="pastille v">Entretien planifié</span>' : ""}${p.c.manuel ? '<span class="pastille">Ajout manuel</span>' : ""}</div>`).join("") : '<span class="meta">—</span>'}</td>
+   <td>${x.pl.length ? x.pl.map(p => `<div style="margin:2px 0"><b>${esc(p.e.nom)}</b> · ${PN(p.o)} ${stat(p)}${p.rang ? `<span class="pastille v">Top ${p.rang}</span>` : ""}${p.m ? '<span class="pastille v">Entretien planifié</span>' : (p.d && p.d.decision === "accepte" ? '<span class="pastille" style="background:#FFF3C4;color:#6a5000">Entretien à planifier</span>' : "")}${p.c.manuel ? '<span class="pastille">Ajout manuel</span>' : ""}</div>`).join("") : '<span class="meta">—</span>'}</td>
    <td><button data-cand="${esc(x.c.id)}">Voir le dossier</button></td></tr>`).join("")}</table>`;
   $("#q-cand").oninput = ev => { Q_CAND = ev.target.value; const p = ev.target.selectionStart; rendreEquipe(); const i = $("#q-cand"); i.focus(); i.setSelectionRange(p, p); };
   $("#f-cand").onchange = ev => { F_CAND = ev.target.value; rendreEquipe(); };
