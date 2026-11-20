@@ -207,6 +207,7 @@ function envoyer(action, payload) {
 function alerteEnvoi() { const m = document.createElement("div"); m.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1A1618;color:#fff;padding:12px 18px;border-radius:12px;z-index:99;font-size:14px;max-width:90vw"; m.textContent = "Votre action n'a pas pu être enregistrée. Vérifiez votre connexion et recommencez."; document.body.appendChild(m); setTimeout(() => m.remove(), 7000); }
 function lireAjouts() { try { return JSON.parse(localStorage.getItem("dc-ajouts")) || []; } catch (_) { return []; } }
 function demarrer() {
+  if (!D.equipe && D.recherche) lireAjouts().forEach(a => { const o = a.entreprise === D.id && D.offres.find(x => x.id === a.offre), c = D.recherche.find(x => x.id === a.candidat); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); });
   if (CONFIG.vivier_demo) lireAjouts().forEach(a => { const o = a.entreprise === D.id && D.offres.find(x => x.id === a.offre), c = CONFIG.vivier_demo.find(x => x.id === a.candidat); if (o && c && !o.candidats.some(x => x.id === c.id)) o.candidats.push(Object.assign({manuel: true}, c)); });
   try { ST = JSON.parse(localStorage.getItem(cleLocale())) || {dec: {}, top: {}}; } catch (_) { ST = {dec: {}, top: {}}; }
   ST.dec = ST.dec || {}; ST.top = ST.top || {};
@@ -239,7 +240,7 @@ function rendre() {
   };
   $("#offre").innerHTML = `
    <div class="offre-tete"><div><h2>${PN(o)}</h2><div class="sub">${esc(o.contrat || "")}${o.contrat && o.lieu ? " · " : ""}${esc(o.lieu || "")} · ${o.candidats.length} candidat${o.candidats.length > 1 ? "s" : ""} sélectionné${o.candidats.length > 1 ? "s" : ""}</div></div>
-    <a class="btn" style="margin-left:auto" href="${URL_OFFRES}" target="_blank" rel="noopener">Revoir l'offre et se préparer</a></div>
+    ${(D.recherche || []).length ? '<button class="prim" id="aj-manuel" style="margin-left:auto">Ajouter un candidat</button>' : ""}<a class="btn" style="margin-left:${(D.recherche || []).length ? "8px" : "auto"}" href="${URL_OFFRES}" target="_blank" rel="noopener">Revoir l'offre et se préparer</a></div>
    ${(() => { const ap = o.candidats.filter(c => { const s = ST.dec[kd(o, c)] || {}; return s.d === "accepte" && !s.entretien; }).length; return ap ? `<div style="margin:10px 0;padding:10px 14px;background:#FFF3C4;color:#6a5000;border-radius:8px"><b>${ap} dossier${ap > 1 ? "s" : ""} accepté${ap > 1 ? "s" : ""}, entretien à planifier.</b> Choisissez le mode de planification sur chaque carte concernée, sinon le candidat n'est pas contacté.</div>` : ""; })()}
    <div class="top3"><h3>Votre top 3</h3><div class="aide">Glissez-déposez les candidats retenus dans l'ordre de votre préférence (ou utilisez « Ajouter au top 3 » sur la carte).</div>
     <div class="slots">${[0, 1, 2].map(slot).join("")}</div></div>
@@ -411,6 +412,7 @@ function brancher(o, top) {
   document.querySelectorAll("details[data-dos]").forEach(d => d.addEventListener("toggle", () => { if (d.open) d.querySelectorAll("iframe[data-src]").forEach(f => { f.src = f.dataset.src; f.removeAttribute("data-src"); }); }));
   const parId = Object.fromEntries(o.candidats.map(c => [c.id, c]));
   const tous = (sel, f) => document.querySelectorAll(sel).forEach(f);
+  if ($("#aj-manuel")) $("#aj-manuel").onclick = () => ajouterManuel(D, o.id);
   tous("[data-acc]", b => b.onclick = () => { ST.dec[kd(o, parId[b.dataset.acc])] = {d: "accepte", plan: {}, quand: new Date().toISOString()}; sauver(); envoyer("decision", {offre: o.id, candidat: b.dataset.acc, decision: "accepte"}); rendre(); });
   tous("[data-ref]", b => b.onclick = () => formulaireRefus(o, parId[b.dataset.ref]));
   tous("[data-annuler]", b => b.onclick = () => { delete ST.dec[kd(o, parId[b.dataset.annuler])]; sauver(); envoyer("decision", {offre: o.id, candidat: b.dataset.annuler, decision: "annulee"}); rendre(); });
@@ -576,18 +578,18 @@ function ficheEquipe(c, e, o) {
   $("#bt-ff").onclick = () => { const f = $("#ff"); f.hidden = !f.hidden; if (!f.hidden) f.scrollIntoView({behavior: "smooth", block: "nearest"}); };
   $("#fermer-fiche").onclick = () => { m.hidden = true; };
 }
-function poolCand() { const M = new Map(); (D.vivier || []).forEach(c => M.set(c.id, c)); (D.recherche || []).forEach(c => { if (!M.has(c.id)) M.set(c.id, c); }); D.entreprises.forEach(e => e.offres.forEach(o => o.candidats.forEach(c => { if (!M.has(c.id)) M.set(c.id, Object.assign({}, c, {reserve: false, manuel: false})); }))); return [...M.values()]; }
+function poolCand() { if (!D.equipe) return (D.recherche || []).slice(); const M = new Map(); (D.vivier || []).forEach(c => M.set(c.id, c)); (D.recherche || []).forEach(c => { if (!M.has(c.id)) M.set(c.id, c); }); D.entreprises.forEach(e => e.offres.forEach(o => o.candidats.forEach(c => { if (!M.has(c.id)) M.set(c.id, Object.assign({}, c, {reserve: false, manuel: false})); }))); return [...M.values()]; }
 function ajouterManuel(e, offreId) {
   const o = e.offres.find(x => x.id === offreId), m = $("#modale"); m.hidden = false;
   const deja = new Set(o.candidats.map(c => c.id));
-  m.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Ajouter un candidat à ${PN(o)}</h2><p class="meta">${esc(e.nom)}. Recherchez par nom ou par numéro de dossier. Le candidat apparaîtra dans l'espace de l'entreprise, avec la mention « Ajout manuel » côté équipe.</p>
+  m.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Ajouter un candidat à ${PN(o)}</h2><p class="meta">${esc(e.nom)}. ${D.equipe ? "Recherchez par nom ou par numéro de dossier. Le candidat apparaîtra dans l'espace de l'entreprise, avec la mention « Ajout manuel » côté équipe." : "Choisissez un candidat parmi les profils similaires que nous vous avons transmis."}</p>
    <label>Rechercher<input id="aj-q" placeholder="Nom, prénom ou numéro de dossier" autocomplete="off"></label><div id="aj-res"></div>
    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="aj-x">Fermer</button></div></div></div>`;
-  const liste = () => { const q = $("#aj-q").value.trim().toLowerCase(); const mots = q.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter(Boolean); const L = poolCand().filter(c => !deja.has(c.id) && (() => { const h = (c.prenom + " " + c.nom + " " + c.id).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); return mots.every(w => h.includes(w)); })()).slice(0, 8);
+  const liste = () => { const q = $("#aj-q").value.trim().toLowerCase(); const mots = q.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter(Boolean); const L = poolCand().filter(c => !deja.has(c.id) && (() => { const h = (c.prenom + " " + c.nom + " " + c.id).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); return mots.every(w => h.includes(w)); })()).slice(0, D.equipe ? 8 : 30);
     $("#aj-res").innerHTML = L.length ? L.map(c => `<div class="jr" style="align-items:center"><div style="flex:1"><b>${esc(c.prenom)} ${esc(c.nom)}</b><div>${badges(c)}</div><div class="meta">${esc([c.residence, c.situation].filter(Boolean).join(" · "))}</div></div><button class="prim" data-aj="${esc(c.id)}">Ajouter</button></div>`).join("") : '<div class="vide">Aucun candidat trouvé.</div>';
     document.querySelectorAll("[data-aj]").forEach(b => b.onclick = () => { const c = poolCand().find(x => x.id === b.dataset.aj);
       const A = lireAjouts(); A.push({entreprise: e.id, offre: offreId, candidat: c.id}); localStorage.setItem("dc-ajouts", JSON.stringify(A));
-      o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; rendreEquipe(); }); };
+      o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; D.equipe ? rendreEquipe() : rendre(); }); };
   $("#aj-q").oninput = liste; liste(); $("#aj-x").onclick = () => { m.hidden = true; };
 }
 </script></body></html>
