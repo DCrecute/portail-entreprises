@@ -117,7 +117,7 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
 <div id="modale" hidden></div>
 
 <script>
-const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8": 1, "089e19f9e9924a06": 1, "b7f850414ee1b9f2": 1, "be77e50db46360ac": 1, "32593ffe7901aa8d": 1, "4e43c978488dc918": 1, "fb0c39441cd0fae6": 1, "5c4f65c1090fd558": 1, "57bbda22d81abfd7": 1, "c0abaf7e7ddb05f4": 1, "8bce3cbb806b3358": 1, "0c42a3e1628f72c4": 1, "ac91af3adecdb972": 1, "e386478a072db1bf": 1, "5b5eb2eb883b7b57": 1, "d2ab86268c6eb377": 1, "3d58c7d31d6ea8f9": 1, "820bc30ffc26cac9": 1, "6cf264e9456e43a5": 1, "776a27a4b6d97862": 1, "e1cd5757ee624404": 1, "fff0cf913e39134b": 1, "6cc876d6f2af72d1": 1, "9d51620be523e3fe": 1, "d21c718da6cfa0e3": 1, "88453fb625d8fd61": 1, "dd01672918a050ee": 1, "e53bffb3af461385": 1, "448a2f33f780dc57": 1, "529e602154481459": 1, "8b8bcfd544692d88": 1, "7188b0c945a7a3ee": 1, "53c57214ad6f3bb7": 1, "8475717e0a13eb66": 1, "4abe3c4da0eab5f4": 1, "7c09c6e012da205d": 1, "8fc6c336f871a822": 1, "464b296f3dd7efb5": 1, "8dc431acf2f3c688": 1, "43d37e7da7f95106": 1, "6d05e63f4de05004": 1, "1b72f64e85dc0da8": 1, "b4e9dbcdebc07fe7": 1, "d07627950f4a23bc": 1, "4d6261d164a1059c": 1, "a3cc7832123a8792": 21};
+const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8": 1, "089e19f9e9924a06": 1, "b7f850414ee1b9f2": 1, "be77e50db46360ac": 1, "32593ffe7901aa8d": 1, "4e43c978488dc918": 1, "fb0c39441cd0fae6": 1, "5c4f65c1090fd558": 1, "57bbda22d81abfd7": 1, "c0abaf7e7ddb05f4": 1, "8bce3cbb806b3358": 1, "0c42a3e1628f72c4": 1, "ac91af3adecdb972": 1, "e386478a072db1bf": 1, "5b5eb2eb883b7b57": 1, "d2ab86268c6eb377": 1, "3d58c7d31d6ea8f9": 1, "820bc30ffc26cac9": 1, "6cf264e9456e43a5": 1, "776a27a4b6d97862": 1, "e1cd5757ee624404": 1, "fff0cf913e39134b": 1, "6cc876d6f2af72d1": 1, "9d51620be523e3fe": 1, "d21c718da6cfa0e3": 1, "88453fb625d8fd61": 1, "dd01672918a050ee": 1, "e53bffb3af461385": 1, "448a2f33f780dc57": 1, "529e602154481459": 1, "8b8bcfd544692d88": 1, "7188b0c945a7a3ee": 1, "53c57214ad6f3bb7": 1, "8475717e0a13eb66": 1, "4abe3c4da0eab5f4": 1, "7c09c6e012da205d": 1, "8fc6c336f871a822": 1, "464b296f3dd7efb5": 1, "8dc431acf2f3c688": 1, "43d37e7da7f95106": 1, "6d05e63f4de05004": 1, "1b72f64e85dc0da8": 1, "b4e9dbcdebc07fe7": 1, "d07627950f4a23bc": 1, "4d6261d164a1059c": 1, "a3cc7832123a8792": 22};
 const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": {"form": "QoexV1", "groupe": "ba76939d-b9ee-449c-9ca3-862f154499cc", "champs": {"cle": "feae75cf-e795-4818-89e2-4a5b9c99471b", "entreprise": "93521726-6d8c-4503-9fb5-c4e1760f5f9e", "action": "081960ed-5654-4af4-94dd-cf3b9c8f6ba4", "offre": "747b4b01-70e0-4057-aaa3-4189887721d3", "candidat": "59883db7-898f-4876-9342-02992566fe6c", "decision": "01d86b74-d624-45c7-b17a-3687818a1245", "motif": "c109fa0f-cef0-4d80-b928-e407454e32c2", "donnees": "d627d1ca-942b-413d-bdd7-5c69cedfa3bd"}}, "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
@@ -130,7 +130,6 @@ const hex = u => [...u].map(x => x.toString(16).padStart(2, "0")).join("");
 let D = null, CLE = "", AESK = null, TAG = "", ST = {dec: {}, top: {}}, offreCourante = null;
 
 if (CONFIG.apercu) { const b = $("#bandeau"); b.hidden = false; b.textContent = "Aperçu de démonstration : candidats d'exemple, aucun envoi réel."; }
-else if (!CONFIG.tally && !CONFIG.endpoint) { const b = $("#bandeau"); b.hidden = false; b.textContent = "Enregistrement des actions désactivé : vos actions restent sur cet ordinateur et ne parviennent pas à l'équipe Diaspora Connect. Prévenez " + EMAIL_RECRUTEMENT + "."; }
 
 /* ---------- accès par code ---------- */
 async function deriver(code) {
@@ -142,12 +141,9 @@ const norm = c => c.normalize("NFKC").toUpperCase().replace(/[\u2010-\u2015\u221
 async function restaurer() {
   if (!CONFIG.tally || !AESK || D.equipe) return;
   try {
-    const r = await fetch("j/" + TAG + ".enc?t=" + Date.now());
-    if (r.status === 404) { rattraper([]); return; }
-    if (!r.ok) return;
+    const r = await fetch("j/" + TAG + ".enc?t=" + Date.now()); if (!r.ok) return;
     const raw = new Uint8Array(await r.arrayBuffer());
     const ev = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, AESK, raw.slice(12))));
-    rattraper(ev);
     ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
     const dec = {}, top = {};
     ev.forEach(e => { if (e.action === "ajout" && e.candidat_data) { const o = D.offres.find(x => x.id === e.offre); if (o && !o.candidats.some(x => x.id === e.candidat_data.id)) o.candidats.push(Object.assign({manuel: true}, e.candidat_data)); } else if (e.action === "ajout_retire") { const o = D.offres.find(x => x.id === e.offre); if (o) o.candidats = o.candidats.filter(x => x.id !== e.candidat); } });
@@ -160,19 +156,6 @@ async function restaurer() {
     Object.entries(top).forEach(([o, l]) => { ST.top[o] = l; });
     sauver(); rendre();
   } catch (_) {}
-}
-/* renvoie ce que ce navigateur a gardé mais que le journal n'a pas (périodes où l'envoi était coupé) ; 30 min de marge pour la synchro */
-function rattraper(ev) {
-  const vu = new Set(ev.map(e => [e.action, e.offre, e.candidat || "", e.decision || ""].join("|")));
-  const topJ = new Set(ev.filter(e => e.action === "top3").map(e => e.offre));
-  const limite = new Date(Date.now() - 30 * 60000).toISOString(), R = ST.renvoi = ST.renvoi || {}, file = [];
-  const ajoute = (cle, quand, action, p) => { if (!R[cle] && !vu.has(cle) && quand && quand < limite) file.push([cle, action, Object.assign(p, {quand, renvoi: true})]); };
-  Object.entries(ST.dec).forEach(([k, v]) => { const [offre, candidat] = k.split("|");
-    if (v.d) ajoute(["decision", offre, candidat, v.d].join("|"), v.quand, "decision", {offre, candidat, decision: v.d, motif: v.motif});
-    if (v.entretien) ajoute(["email", offre, candidat, ""].join("|"), v.entretien.quand, "email", {offre, candidat, mode: v.entretien.mode, objet: v.entretien.objet, planification: v.plan});
-    if (v.bc) ajoute(["business_case", offre, candidat, ""].join("|"), v.bc.quand, "business_case", {offre, candidat, objet: v.bc.objet, restitution: v.bc.restitution}); });
-  Object.entries(ST.top).forEach(([offre, cl]) => { if (!topJ.has(offre) && (cl || []).some(Boolean)) ajoute(["top3", offre, "", ""].join("|"), limite.slice(0, 10), "top3", {offre, classement: cl}); });
-  file.reduce((pr, [cle, action, p]) => pr.then(() => envoyer(action, p)).then(r => { if (r && r.ok) { R[cle] = 1; sauver(); } }), Promise.resolve());
 }
 async function ouvrir(code) {
   const net = norm(code);
@@ -204,7 +187,7 @@ setTimeout(() => { try { const s = JSON.parse(sessionStorage.getItem("dc-session
 function cleLocale() { return "dc-portail-" + CLE; }
 function sauver() { try { localStorage.setItem(cleLocale(), JSON.stringify(ST)); } catch (_) {} }
 function envoyer(action, payload) {
-  const base = {cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, quand: new Date().toISOString(), ...payload};
+  const base = {cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, ...payload, quand: new Date().toISOString()};
   const T = CONFIG.tally;
   if (T) {
     const champs = {cle: base.cle, entreprise: base.entreprise, action, offre: base.offre || "", candidat: base.candidat || "", decision: base.decision || "", motif: base.motif || ""};
@@ -312,9 +295,9 @@ function planif(o, c) {
    <label class="opt ${ok1 ? "" : "grise"} ${m === "candidat" ? "sel" : ""}"><input type="radio" name="m-${id}" value="candidat" ${ok1 ? "" : "disabled"} ${m === "candidat" ? "checked" : ""}><span>Lien de réservation du candidat<small>${ok1 ? "Choisissez un créneau sur son agenda. Le candidat est prévenu par e-mail." : "Indisponible : le candidat n'a pas renseigné de lien de réservation."}</small></span></label>
    <label class="opt ${m === "recruteur" ? "sel" : ""}"><input type="radio" name="m-${id}" value="recruteur" ${m === "recruteur" ? "checked" : ""}><span>Partager mon lien de réservation<small>Le candidat reçoit votre lien et réserve un créneau.</small></span></label>
    <label class="opt ${m === "manuel" ? "sel" : ""}"><input type="radio" name="m-${id}" value="manuel" ${m === "manuel" ? "checked" : ""}><span>Manuellement<small>Vous indiquez vos disponibilités, le candidat répond par e-mail.</small></span></label></div>
-   ${m === "candidat" ? `<div style="margin-top:10px"><a class="btn" href="${esc(c.calendly)}" target="_blank" rel="noopener" data-lien-c="${id}">1. Ouvrir l'agenda du candidat ↗</a> <button class="prim" data-apercu="${id}">2. J'ai réservé : envoyer au candidat</button></div>` : ""}
-   ${m === "recruteur" ? `<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>Nom et prénom<input data-f="nom" data-c="${id}" value="${esc(p.nom || "")}"></label><label>Fonction<input data-f="fonction" data-c="${id}" value="${esc(p.fonction || "")}"></label><label>Lien de réservation<input type="url" data-f="lien" data-c="${id}" value="${esc(p.lien || "")}" placeholder="https://"></label><label>E-mail (en copie)<input type="email" data-f="email" data-c="${id}" value="${esc(p.email || "")}"></label></div><button class="prim" data-apercu="${id}">Envoyer au candidat</button>` : ""}
-   ${m === "manuel" ? `<div style="margin-top:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>Nom et prénom<input data-f="nom" data-c="${id}" value="${esc(p.nom || "")}"></label><label>Fonction<input data-f="fonction" data-c="${id}" value="${esc(p.fonction || "")}"></label></div><label>Vos disponibilités<textarea rows="3" data-f="dispos" data-c="${id}" placeholder="Ex. : mardi 17 de 10h à 12h, jeudi 19 après 14h (heure d'Abidjan)">${esc(p.dispos || "")}</textarea></label><label>E-mail (en copie)<input type="email" data-f="email" data-c="${id}" value="${esc(p.email || "")}"></label><button class="prim" data-apercu="${id}">Envoyer au candidat</button></div>` : ""}`;
+   ${m === "candidat" ? `<div style="margin-top:10px"><a class="btn" href="${esc(c.calendly)}" target="_blank" rel="noopener" data-lien-c="${id}">1. Ouvrir l'agenda du candidat ↗</a> <button class="prim" data-apercu="${id}">2. J'ai réservé : voir l'e-mail au candidat</button></div>` : ""}
+   ${m === "recruteur" ? `<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>Nom et prénom<input data-f="nom" data-c="${id}" value="${esc(p.nom || "")}"></label><label>Fonction<input data-f="fonction" data-c="${id}" value="${esc(p.fonction || "")}"></label><label>Lien de réservation<input type="url" data-f="lien" data-c="${id}" value="${esc(p.lien || "")}" placeholder="https://"></label><label>E-mail (en copie)<input type="email" data-f="email" data-c="${id}" value="${esc(p.email || "")}"></label></div><button class="prim" data-apercu="${id}">Voir l'e-mail au candidat</button>` : ""}
+   ${m === "manuel" ? `<div style="margin-top:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px"><label>Nom et prénom<input data-f="nom" data-c="${id}" value="${esc(p.nom || "")}"></label><label>Fonction<input data-f="fonction" data-c="${id}" value="${esc(p.fonction || "")}"></label></div><label>Vos disponibilités<textarea rows="3" data-f="dispos" data-c="${id}" placeholder="Ex. : mardi 17 de 10h à 12h, jeudi 19 après 14h (heure d'Abidjan)">${esc(p.dispos || "")}</textarea></label><label>E-mail (en copie)<input type="email" data-f="email" data-c="${id}" value="${esc(p.email || "")}"></label><button class="prim" data-apercu="${id}">Voir l'e-mail au candidat</button></div>` : ""}`;
 }
 
 /* ---------- e-mails ---------- */
@@ -578,20 +561,14 @@ function exporterCsv(lignes) {
   const rows = [["Entreprise", "Offre", "Dossier", "Candidat", "Genre", "Note /5", "Décision", "Motif", "Entretien", "Top 3"]].concat(lignes.map(l => [l.e.nom, l.o.poste + (l.o.annule ? " (ANNULÉ)" : ""), l.c.id, l.c.prenom + " " + l.c.nom, l.c.genre, noteTxt(l.c), l.d ? l.d.decision : "à traiter", l.d ? l.d.motif : "", l.m ? LIB[l.m.mode] : "", l.rang || ""]));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.map(r => r.map(q).join(";")).join("\n")], {type: "text/csv"})); a.download = "suivi-entreprises.csv"; a.click();
 }
-function decisionsHtml(c) {
-  const S = etatEquipe(), L = [];
-  D.entreprises.forEach(e => e.offres.forEach(o => { if (o.candidats.some(x => x.id === c.id)) L.push({e, o, d: S.dec[e.id + "|" + o.id + "|" + c.id]}); }));
-  if (!L.length) return "";
-  return `<div class="zone" style="margin:10px 0"><b>Décision des entreprises</b>${L.map(l => `<div style="margin:6px 0"><b>${esc(l.e.nom)}</b> · ${PN(l.o)} ${l.d ? (l.d.decision === "accepte" ? '<span class="pastille v">Validée</span>' : '<span class="pastille g">Refusée</span>') + `<span class="meta"> le ${FR(l.d.quand)}</span>` + (l.d.decision === "refus" && l.d.motif ? `<div class="meta"><b>Motif du refus :</b> ${esc(l.d.motif)}</div>` : "") : '<span class="pastille">En attente de décision</span>'}</div>`).join("")}</div>`;
-}
 function ficheEquipe(c, e, o) {
   const en = c.entretien;
   const crit = NOTES.filter(n => c.notes && c.notes[n[0]]).map(n => `<div style="margin:8px 0"><div style="display:flex;justify-content:space-between"><b>${n[1]}</b>${etoiles(c.notes[n[0]])}</div>${en && en.commentaires && en.commentaires[n[0]] ? `<div class="meta" style="margin-top:2px">${esc(en.commentaires[n[0]])}</div>` : ""}</div>`).join("");
   const m = $("#modale"); m.hidden = false;
   m.innerHTML = `<div class="fond"><div class="modale large"><h2 style="font-size:22px">${esc(c.prenom)} ${esc(c.nom)}</h2><div>${badges(c)}</div>
    <p class="meta">${o ? "Offre : " + PN(o) + " · " + esc(e.nom) : "Pas encore shortlisté chez une entreprise"}</p>
-   ${decisionsHtml(c)}
    ${dossierHtml(c, true)}
+   ${positionnementsHtml(c)}
    <div style="margin:14px 0 0;display:flex;gap:10px;flex-wrap:wrap"><button class="prim" id="bt-ff">Voir le résumé Fireflies et la notation complète</button>${en && en.fireflies_url ? `<a class="btn" href="${esc(en.fireflies_url)}" target="_blank" rel="noopener">Ouvrir l'enregistrement dans Fireflies ↗</a>` : ""}</div>
    <div class="ff" id="ff" hidden><h3 style="font-size:17px;margin-bottom:6px">Entretien de découverte <span class="meta">(équipe uniquement)</span></h3>
     ${en ? `${en.recommandation ? `<span class="pastille v">Recommandation : ${esc(en.recommandation)}</span>` : ""}
