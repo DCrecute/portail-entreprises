@@ -130,6 +130,7 @@ const hex = u => [...u].map(x => x.toString(16).padStart(2, "0")).join("");
 let D = null, CLE = "", AESK = null, TAG = "", ST = {dec: {}, top: {}}, offreCourante = null;
 
 if (CONFIG.apercu) { const b = $("#bandeau"); b.hidden = false; b.textContent = "Aperçu de démonstration : candidats d'exemple, aucun envoi réel."; }
+else if (!CONFIG.tally && !CONFIG.endpoint) { const b = $("#bandeau"); b.hidden = false; b.textContent = "Enregistrement des actions désactivé : vos actions restent sur cet ordinateur et ne parviennent pas à l'équipe Diaspora Connect. Prévenez " + EMAIL_RECRUTEMENT + "."; }
 
 /* ---------- accès par code ---------- */
 async function deriver(code) {
@@ -141,9 +142,12 @@ const norm = c => c.normalize("NFKC").toUpperCase().replace(/[\u2010-\u2015\u221
 async function restaurer() {
   if (!CONFIG.tally || !AESK || D.equipe) return;
   try {
-    const r = await fetch("j/" + TAG + ".enc?t=" + Date.now()); if (!r.ok) return;
+    const r = await fetch("j/" + TAG + ".enc?t=" + Date.now());
+    if (r.status === 404) { rattraper([]); return; }
+    if (!r.ok) return;
     const raw = new Uint8Array(await r.arrayBuffer());
     const ev = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name: "AES-GCM", iv: raw.slice(0, 12)}, AESK, raw.slice(12))));
+    rattraper(ev);
     ev.sort((a, b) => String(a.quand).localeCompare(String(b.quand)));
     const dec = {}, top = {};
     ev.forEach(e => { if (e.action === "ajout" && e.candidat_data) { const o = D.offres.find(x => x.id === e.offre); if (o && !o.candidats.some(x => x.id === e.candidat_data.id)) o.candidats.push(Object.assign({manuel: true}, e.candidat_data)); } else if (e.action === "ajout_retire") { const o = D.offres.find(x => x.id === e.offre); if (o) o.candidats = o.candidats.filter(x => x.id !== e.candidat); } });
@@ -156,6 +160,19 @@ async function restaurer() {
     Object.entries(top).forEach(([o, l]) => { ST.top[o] = l; });
     sauver(); rendre();
   } catch (_) {}
+}
+/* renvoie ce que ce navigateur a gardé mais que le journal n'a pas (périodes où l'envoi était coupé) ; 30 min de marge pour la synchro */
+function rattraper(ev) {
+  const vu = new Set(ev.map(e => [e.action, e.offre, e.candidat || "", e.decision || ""].join("|")));
+  const topJ = new Set(ev.filter(e => e.action === "top3").map(e => e.offre));
+  const limite = new Date(Date.now() - 30 * 60000).toISOString(), R = ST.renvoi = ST.renvoi || {}, file = [];
+  const ajoute = (cle, quand, action, p) => { if (!R[cle] && !vu.has(cle) && quand && quand < limite) file.push([cle, action, Object.assign(p, {quand, renvoi: true})]); };
+  Object.entries(ST.dec).forEach(([k, v]) => { const [offre, candidat] = k.split("|");
+    if (v.d) ajoute(["decision", offre, candidat, v.d].join("|"), v.quand, "decision", {offre, candidat, decision: v.d, motif: v.motif});
+    if (v.entretien) ajoute(["email", offre, candidat, ""].join("|"), v.entretien.quand, "email", {offre, candidat, mode: v.entretien.mode, objet: v.entretien.objet, planification: v.plan});
+    if (v.bc) ajoute(["business_case", offre, candidat, ""].join("|"), v.bc.quand, "business_case", {offre, candidat, objet: v.bc.objet, restitution: v.bc.restitution}); });
+  Object.entries(ST.top).forEach(([offre, cl]) => { if (!topJ.has(offre) && (cl || []).some(Boolean)) ajoute(["top3", offre, "", ""].join("|"), limite.slice(0, 10), "top3", {offre, classement: cl}); });
+  file.reduce((pr, [cle, action, p]) => pr.then(() => envoyer(action, p)).then(r => { if (r && r.ok) { R[cle] = 1; sauver(); } }), Promise.resolve());
 }
 async function ouvrir(code) {
   const net = norm(code);
@@ -187,7 +204,7 @@ setTimeout(() => { try { const s = JSON.parse(sessionStorage.getItem("dc-session
 function cleLocale() { return "dc-portail-" + CLE; }
 function sauver() { try { localStorage.setItem(cleLocale(), JSON.stringify(ST)); } catch (_) {} }
 function envoyer(action, payload) {
-  const base = {cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, ...payload, quand: new Date().toISOString()};
+  const base = {cle: CLE, entreprise: D.id, entreprise_nom: D.nom, action, quand: new Date().toISOString(), ...payload};
   const T = CONFIG.tally;
   if (T) {
     const champs = {cle: base.cle, entreprise: base.entreprise, action, offre: base.offre || "", candidat: base.candidat || "", decision: base.decision || "", motif: base.motif || ""};
