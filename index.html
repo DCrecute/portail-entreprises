@@ -593,4 +593,4 @@ function ajouterManuel(e, offreId) {
       o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; D.equipe ? rendreEquipe() : rendre(); }); };
   $("#aj-q").oninput = liste; liste(); $("#aj-x").onclick = () => { m.hidden = true; };
 }
-</script></body></html>
+</script><script src="extensions.js"></script></body></html>
