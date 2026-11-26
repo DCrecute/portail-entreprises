@@ -118,7 +118,7 @@ table.t th{background:var(--cream);text-align:left;font-size:12px;text-transform
 
 <script>
 const BLOBS = {"9be0d8a28755a00f": 1, "2a64f3bffd629f35": 1, "cd3fa1c1d03e1ba8": 1, "089e19f9e9924a06": 1, "b7f850414ee1b9f2": 1, "be77e50db46360ac": 1, "32593ffe7901aa8d": 1, "4e43c978488dc918": 1, "fb0c39441cd0fae6": 1, "5c4f65c1090fd558": 1, "57bbda22d81abfd7": 1, "c0abaf7e7ddb05f4": 1, "8bce3cbb806b3358": 1, "0c42a3e1628f72c4": 1, "ac91af3adecdb972": 1, "e386478a072db1bf": 1, "5b5eb2eb883b7b57": 1, "d2ab86268c6eb377": 1, "3d58c7d31d6ea8f9": 1, "820bc30ffc26cac9": 1, "6cf264e9456e43a5": 1, "776a27a4b6d97862": 1, "e1cd5757ee624404": 1, "fff0cf913e39134b": 1, "6cc876d6f2af72d1": 1, "9d51620be523e3fe": 1, "d21c718da6cfa0e3": 1, "88453fb625d8fd61": 1, "dd01672918a050ee": 1, "e53bffb3af461385": 1, "448a2f33f780dc57": 1, "529e602154481459": 1, "8b8bcfd544692d88": 1, "7188b0c945a7a3ee": 1, "53c57214ad6f3bb7": 1, "8475717e0a13eb66": 1, "4abe3c4da0eab5f4": 1, "7c09c6e012da205d": 1, "8fc6c336f871a822": 1, "464b296f3dd7efb5": 1, "8dc431acf2f3c688": 1, "43d37e7da7f95106": 1, "6d05e63f4de05004": 1, "1b72f64e85dc0da8": 1, "b4e9dbcdebc07fe7": 1, "d07627950f4a23bc": 1, "4d6261d164a1059c": 1, "5cfbfd3b00cc6638": 1, "a96c10da4fea3422": 1, "a3cc7832123a8792": 23};
-const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": {"form": "QoexV1", "groupe": "ba76939d-b9ee-449c-9ca3-862f154499cc", "champs": {"cle": "feae75cf-e795-4818-89e2-4a5b9c99471b", "entreprise": "93521726-6d8c-4503-9fb5-c4e1760f5f9e", "action": "081960ed-5654-4af4-94dd-cf3b9c8f6ba4", "offre": "747b4b01-70e0-4057-aaa3-4189887721d3", "candidat": "59883db7-898f-4876-9342-02992566fe6c", "decision": "01d86b74-d624-45c7-b17a-3687818a1245", "motif": "c109fa0f-cef0-4d80-b928-e407454e32c2", "donnees": "d627d1ca-942b-413d-bdd7-5c69cedfa3bd"}}, "apercu": false, "journal": [], "vivier_demo": []};
+const CONFIG = {"demo": {}, "sel": "/p51RIxTayOp7ZdoXd3bfw==", "iter": 200000, "endpoint": "", "tally": null, "apercu": false, "journal": [], "vivier_demo": []};
 const URL_OFFRES = "https://www.diaspora-connect.africa/offres-off.html";
 const EMAIL_RECRUTEMENT = "recrutement@diaspora-connect.africa";
 const SIGNATURE_MAIL = `<p>Bien cordialement,<br>L'équipe recrutement Diaspora Connect</p><p style="margin:0">&nbsp;</p><table style="border-collapse:collapse"><tr><td style="padding-right:16px;vertical-align:middle"><b>Miryam Matinua</b><br><i>Responsable Recrutement &amp; Coordination | Diaspora Connect</i><br>Fondation MStudio<br><a href="mailto:recrutement@diaspora-connect.africa">recrutement@diaspora-connect.africa</a></td><td style="vertical-align:middle"><img src="https://www.diaspora-connect.africa/assets/marque/logo-tagline-color.png" alt="Diaspora Connect" height="46" style="margin-right:10px"> <img src="https://raw.githubusercontent.com/leslita06/dc-signature-logos-q7w2/main/logo-mstudio.png" alt="MStudio" height="46"></td></tr></table>`;
@@ -151,8 +151,9 @@ async function restaurer() {
       if (e.action === "decision") { if (e.decision === "annulee") delete dec[k]; else dec[k] = Object.assign(dec[k] || {plan: {}}, {d: e.decision, motif: e.motif, quand: e.quand}); }
       else if (e.action === "email" && dec[k]) dec[k].entretien = {mode: e.mode, quand: e.quand, objet: e.objet};
       else if (e.action === "business_case") (dec[k] = dec[k] || {}).bc = {quand: e.quand, objet: e.objet, restitution: e.restitution};
+      else if (e.action === "offre") (dec[k] = dec[k] || {}).offre = {quand: e.quand, detail: e.detail};
       else if (e.action === "top3") top[e.offre] = e.classement || []; });
-    Object.entries(dec).forEach(([k, v]) => { if (!(ST.dec[k] && ST.dec[k].d)) ST.dec[k] = Object.assign({}, v, ST.dec[k] || {}, {d: v.d, motif: v.motif, entretien: v.entretien || (ST.dec[k] || {}).entretien, bc: v.bc || (ST.dec[k] || {}).bc}); });
+    Object.entries(dec).forEach(([k, v]) => { if (!(ST.dec[k] && ST.dec[k].d)) ST.dec[k] = Object.assign({}, v, ST.dec[k] || {}, {d: v.d, motif: v.motif, entretien: v.entretien || (ST.dec[k] || {}).entretien, bc: v.bc || (ST.dec[k] || {}).bc, offre: v.offre || (ST.dec[k] || {}).offre}); });
     Object.entries(top).forEach(([o, l]) => { ST.top[o] = l; });
     sauver(); rendre();
   } catch (_) {}
@@ -244,6 +245,7 @@ function rendre() {
    ${(() => { const ap = o.candidats.filter(c => { const s = ST.dec[kd(o, c)] || {}; return s.d === "accepte" && !s.entretien; }).length; return ap ? `<div style="margin:10px 0;padding:10px 14px;background:#FFF3C4;color:#6a5000;border-radius:8px"><b>${ap} dossier${ap > 1 ? "s" : ""} accepté${ap > 1 ? "s" : ""}, entretien à planifier.</b> Choisissez le mode de planification sur chaque carte concernée, sinon le candidat n'est pas contacté.</div>` : ""; })()}
    <div class="top3"><h3>Votre top 3</h3><div class="aide">Glissez-déposez les candidats retenus dans l'ordre de votre préférence (ou utilisez « Ajouter au top 3 » sur la carte).</div>
     <div class="slots">${[0, 1, 2].map(slot).join("")}</div></div>
+   <div style="margin:-6px 0 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button class="prim" id="faire-offre" ${top.some(Boolean) ? "" : 'disabled title="Classez d\'abord au moins un candidat dans votre top 3"'}>Faire une offre</button><span class="meta">${top.some(Boolean) ? "Choisissez un candidat de votre top 3, puis renseignez les conditions de l'offre." : "Disponible dès qu'un candidat figure dans votre top 3."}</span>${o.candidats.filter(c => (ST.dec[kd(o, c)] || {}).offre).map(c => `<span class="pastille v">Offre faite : ${esc(c.prenom)} ${esc(c.nom)}</span>`).join("")}</div>
    ${o.candidats.map(c => carte(o, c, top)).join("") || '<div class="vide">Aucun candidat partagé pour cette offre pour l\'instant.</div>'}`;
   brancher(o, top);
 }
@@ -265,7 +267,7 @@ function carte(o, c, top) {
   }
   return `<article class="carte ${s.d === "accepte" ? "accepte" : s.d === "refus" ? "refuse" : ""}" draggable="${s.d === "refus" ? "false" : "true"}" data-c="${esc(c.id)}">
    <div class="cl"><div><div class="nom">${esc(c.prenom)} ${esc(c.nom)}</div><div class="meta">${esc([c.residence, c.situation].filter(Boolean).join(" · "))}</div><div>${badges(c)}</div>${c.situation_projet ? `<div class="situation"><b>Situation qui décrit le mieux son projet</b>${esc(c.situation_projet)}</div>` : ""}</div>
-    <div style="margin-left:auto">${rang >= 0 ? `<span class="pastille v">Top 3 · n° ${rang + 1}</span>` : ""}${s.d === "accepte" ? '<span class="pastille v">Accepté</span>' : s.d === "refus" ? '<span class="pastille g">Refusé</span>' : '<span class="pastille">À traiter</span>'}</div></div>
+    <div style="margin-left:auto">${rang >= 0 ? `<span class="pastille v">Top 3 · n° ${rang + 1}</span>` : ""}${s.offre ? '<span class="pastille v">Offre faite</span>' : ""}${s.d === "accepte" ? '<span class="pastille v">Accepté</span>' : s.d === "refus" ? '<span class="pastille g">Refusé</span>' : '<span class="pastille">À traiter</span>'}</div></div>
    ${notes ? `<div class="notes" title="Notation de l'entretien de découverte">${notes}</div>` : ""}
    <details data-dos><summary style="cursor:pointer;color:var(--violet);font-weight:500">Voir le dossier</summary>${dossierHtml(c)}</details>
    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${c.cv ? `<a class="btn" href="${esc(c.cv)}" target="_blank" rel="noopener">CV</a>` : ""}${c.linkedin ? `<a class="btn" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}</div>
@@ -408,12 +410,109 @@ function apercuBC(o, c, v) {
     s.bc = {quand: new Date().toISOString(), objet: m.objet, restitution: bc.restitution}; delete s.bc_brouillon; sauver(); el.hidden = true; rendre();
   };
 }
+/* ---------- faire une offre ---------- */
+const OFFRE_DEMARRAGE = "25 janvier 2027";
+const TYPES_CONTRAT = ["CDI", "CDD", "Stage", "Alternance", "Prestation / freelance"];
+const typeDepuis = t => { const x = String(t || "").toLowerCase(); return /cdd|mission/.test(x) ? "CDD" : /cdi/.test(x) ? "CDI" : /stage/.test(x) ? "Stage" : /altern/.test(x) ? "Alternance" : /free|presta/.test(x) ? "Prestation / freelance" : ""; };
+function texteOffre(d) {
+  return ["Poste : " + d.poste, "Entreprise : " + d.entreprise, "Salaire : " + d.salaire, "Type de contrat : " + d.contrat + (d.duree ? " (" + d.duree + ")" : ""),
+    "Supérieur hiérarchique : " + d.superieur, "Date de démarrage : " + d.demarrage, "Avantages : " + (d.avantages || "aucun renseigné"),
+    "Télétravail : " + d.teletravail + (d.teletravail_conditions ? " (" + d.teletravail_conditions + ")" : ""), "", "Fiche de poste :", d.fiche].join("\n");
+}
+function choisirCandidatOffre(o, top) {
+  const el = $("#modale"); el.hidden = false;
+  const parId = Object.fromEntries(o.candidats.map(c => [c.id, c]));
+  const liste = top.map((id, i) => parId[id] ? {c: parId[id], rang: i + 1} : null).filter(Boolean);
+  let choix = (ST.offre_choix && liste.some(x => x.c.id === ST.offre_choix[o.id])) ? ST.offre_choix[o.id] : "";
+  const dessiner = () => {
+    el.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Faire une offre : étape 1 sur 2</h2>
+     <p class="meta">${esc(D.nom)} · ${esc(o.poste)}. Sélectionnez le candidat de votre top 3 à qui vous souhaitez faire une offre.</p>
+     <div class="options">${liste.map(x => `<label class="opt ${choix === x.c.id ? "sel" : ""}"><input type="radio" name="oc" value="${esc(x.c.id)}" ${choix === x.c.id ? "checked" : ""}><span><b>N° ${x.rang} · ${esc(x.c.prenom)} ${esc(x.c.nom)}</b>${(ST.dec[kd(o, x.c)] || {}).offre ? "<small>Une offre a déjà été faite à ce candidat : une nouvelle offre la remplacera.</small>" : ""}</span></label>`).join("")}</div>
+     <div id="oc-err" class="meta" style="color:#B00020;min-height:18px;margin-top:8px"></div>
+     <div style="display:flex;gap:10px;justify-content:flex-end"><button id="oc-x">Annuler</button><button class="prim" id="oc-ok">Continuer</button></div></div></div>`;
+    document.querySelectorAll("input[name=oc]").forEach(r => r.onchange = () => { choix = r.value; dessiner(); });
+    $("#oc-x").onclick = () => { el.hidden = true; };
+    $("#oc-ok").onclick = () => { if (!choix) { $("#oc-err").textContent = "Choisissez un candidat."; return; } (ST.offre_choix = ST.offre_choix || {})[o.id] = choix; formulaireOffre(o, parId[choix]); };
+  };
+  dessiner();
+}
+function formulaireOffre(o, c) {
+  const el = $("#modale"); el.hidden = false;
+  const s = (ST.dec[kd(o, c)] = ST.dec[kd(o, c)] || {});
+  const v = (s.offre_brouillon = s.offre_brouillon || {poste: o.poste || "", salaire: "", recruteur_email: "", contrat: typeDepuis(o.contrat_site || o.contrat), duree: "", superieur: o.superieur || "", avantages: o.avantages || "", teletravail: o.tt || "", conditions: o.tt_cond || "", fiche: o.fiche || ""});
+  const dessiner = () => {
+    const cdi = v.contrat === "CDI";
+    el.innerHTML = `<div class="fond"><div class="modale large"><h2 style="font-size:22px">Faire une offre à ${esc(c.prenom)} ${esc(c.nom)} : étape 2 sur 2</h2>
+     <p class="meta">Les champs sont préremplis avec les informations de l'offre ; modifiez-les si besoin.</p>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px">
+      <label>Titre du poste<input id="of-poste" value="${esc(v.poste)}"></label>
+      <label>Entreprise<input id="of-ent" value="${esc(D.nom)}" disabled style="background:#EFEAE6;color:#8a8286"></label>
+      ${(o.salaire || "").trim() ? `<div style="grid-column:1/3;background:#FFF6EE;border:1px solid var(--orange);border-radius:10px;padding:9px 12px;margin:0 0 12px;font-size:14px"><b>Rappel :</b> rémunération indiquée par l'entreprise sur son offre : « ${esc(o.salaire)} »</div>` : ""}
+      <label>Salaire proposé (montant, brut ou net, période)<input id="of-sal" value="${esc(v.salaire)}" placeholder="Ex. : 1 200 000 FCFA brut par mois"></label>
+      <label>Type de contrat<select id="of-type"><option value="">Choisir…</option>${TYPES_CONTRAT.map(t => `<option ${v.contrat === t ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+      <label>Durée du contrat (en mois)<input id="of-duree" type="number" min="1" max="120" ${cdi ? "disabled" : ""} value="${cdi ? "" : esc(v.duree)}" placeholder="${cdi ? "Indéterminée (CDI)" : "Nombre de mois"}" style="${cdi ? "background:#EFEAE6;color:#8a8286" : ""}"></label>
+      <label>Date de démarrage<input id="of-date" value="${OFFRE_DEMARRAGE}" disabled style="background:#EFEAE6;color:#8a8286"></label>
+      <label>Supérieur hiérarchique (nom et fonction)<input id="of-sup" value="${esc(v.superieur)}" placeholder="Ex. : Awa Koné, Directrice générale"></label>
+      <label style="grid-column:1/3">Votre e-mail (recruteur, en copie de l'e-mail au candidat)<input id="of-rec" type="email" value="${esc(v.recruteur_email || "")}" placeholder="prenom.nom@entreprise.com"></label>
+     </div>
+     <label>Avantages<textarea id="of-av" rows="3" placeholder="Ex. : mutuelle, prime de transport, logement…">${esc(v.avantages)}</textarea></label>
+     <div style="margin:4px 0 8px"><b>Télétravail autorisé</b></div>
+     <div class="options" style="margin-bottom:12px;grid-template-columns:repeat(3,1fr)">${[["oui", "Oui"], ["non", "Non"], ["conditions", "Sous conditions"]].map(([k, l]) => `<label class="opt ${v.teletravail === k ? "sel" : ""}"><input type="radio" name="of-tt" value="${k}" ${v.teletravail === k ? "checked" : ""}><span>${l}</span></label>`).join("")}</div>
+     ${v.teletravail === "conditions" ? `<label>Précisez les conditions<textarea id="of-cond" rows="2" placeholder="Ex. : 2 jours par semaine, après la période d'essai">${esc(v.conditions)}</textarea></label>` : ""}
+     <label>Fiche de poste (modifiable)<textarea id="of-fiche" rows="12" maxlength="6000">${esc(v.fiche)}</textarea></label>
+     <div id="of-err" class="meta" style="color:#B00020;min-height:18px"></div>
+     <div style="display:flex;gap:10px;justify-content:flex-end"><button id="of-retour">Retour</button><button id="of-x">Annuler</button><button class="prim" id="of-ap">Envoyer l'offre</button></div></div></div>`;
+    const lire = () => { v.poste = $("#of-poste").value.trim(); v.salaire = $("#of-sal").value.trim(); v.contrat = $("#of-type").value; if ($("#of-duree") && !$("#of-duree").disabled) v.duree = $("#of-duree").value.trim(); v.superieur = $("#of-sup").value.trim(); v.recruteur_email = $("#of-rec").value.trim(); v.avantages = $("#of-av").value; if ($("#of-cond")) v.conditions = $("#of-cond").value; v.fiche = $("#of-fiche").value; };
+    $("#of-type").onchange = () => { lire(); dessiner(); };
+    document.querySelectorAll("input[name=of-tt]").forEach(r => r.onchange = () => { lire(); v.teletravail = r.value; dessiner(); });
+    $("#of-x").onclick = () => { el.hidden = true; };
+    $("#of-retour").onclick = () => { lire(); choisirCandidatOffre(o, ST.top[o.id] || []); };
+    $("#of-ap").onclick = () => { lire(); const manque = [];
+      if (!v.poste) manque.push("le titre du poste"); if (!v.salaire) manque.push("le salaire"); if (!v.contrat) manque.push("le type de contrat");
+      if (v.contrat && v.contrat !== "CDI" && !(+v.duree > 0)) manque.push("la durée du contrat en mois"); if (!v.superieur) manque.push("le supérieur hiérarchique"); if (!/^\S+@\S+\.\S+$/.test(v.recruteur_email || "")) manque.push("votre e-mail (en copie)");
+      if (!v.teletravail) manque.push("le télétravail (oui, non ou sous conditions)"); if (v.teletravail === "conditions" && !(v.conditions || "").trim()) manque.push("les conditions du télétravail");
+      if (!(v.fiche || "").trim()) manque.push("la fiche de poste");
+      if (manque.length) { $("#of-err").textContent = "Merci de renseigner : " + manque.join(", ") + "."; return; }
+      apercuOffre(o, c, v); };
+  };
+  dessiner();
+}
+const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"], JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+function echeance72() {   // 72 h après l'envoi ; Abidjan = heure UTC (GMT)
+  const e = new Date(Date.now() + 72 * 3600 * 1000), p = n => String(n).padStart(2, "0");
+  return JOURS[e.getUTCDay()] + " " + e.getUTCDate() + " " + MOIS[e.getUTCMonth()] + " " + e.getUTCFullYear() + " à " + p(e.getUTCHours()) + "h" + p(e.getUTCMinutes()) + " (heure d'Abidjan)";
+}
+function mailOffre(o, c, d, rec) {
+  const ent = D.nom, prenom = c.prenom, equipe = estEquipe(c), sign = SIGNATURE_MAIL;
+  const ligne = (k, val) => `<tr><td style="padding:4px 14px 4px 0;color:#6b6368;vertical-align:top">${k}</td><td style="padding:4px 0"><b>${esc(val)}</b></td></tr>`;
+  const tt = d.teletravail + (d.teletravail_conditions ? " : " + d.teletravail_conditions : "");
+  const debut = equipe ? `<p>Suite à la proposition de votre profil par l'équipe Diaspora Connect, <b>${esc(ent)}</b> a le plaisir de vous faire une <b>offre</b> pour le poste <b>${esc(d.poste)}</b>.</p>` : `<p>Suite à votre candidature, <b>${esc(ent)}</b> a le plaisir de vous faire une <b>offre</b> pour le poste <b>${esc(d.poste)}</b>.</p>`;
+  return {de: EMAIL_RECRUTEMENT, a: prenom + " " + c.nom + " (adresse du dossier)", cc: rec, objet: `Offre d'emploi ${ent} : ${d.poste}`,
+    corps: `<p>Bonjour ${esc(prenom)},</p>${debut}<table style="border-collapse:collapse;margin:8px 0">${ligne("Poste", d.poste)}${ligne("Entreprise", ent)}${ligne("Salaire", d.salaire)}${ligne("Type de contrat", d.contrat + (d.duree ? " (" + d.duree + ")" : ""))}${ligne("Supérieur hiérarchique", d.superieur)}${ligne("Date de démarrage", d.demarrage)}${ligne("Télétravail", tt)}</table>${d.avantages ? `<p><b>Avantages</b></p><p style="white-space:pre-line">${esc(d.avantages)}</p>` : ""}<p><b>Fiche de poste</b></p><p style="white-space:pre-line">${esc(d.fiche)}</p><p style="background:#FFF6EE;border-left:4px solid #F16900;padding:10px 12px"><b>Délai de réponse : 72 heures.</b> Merci de nous faire part de votre décision (acceptation ou refus) au plus tard le <b>${esc(d.echeance)}</b>.</p><p>Vous pouvez répondre directement à cet e-mail. ${esc(rec)} (recruteur) est en copie.</p>${sign}`};
+}
+function apercuOffre(o, c, v) {
+  const d = {poste: v.poste, entreprise: D.nom, salaire: v.salaire, contrat: v.contrat, duree: v.contrat === "CDI" ? "durée indéterminée" : v.duree + " mois", superieur: v.superieur, demarrage: OFFRE_DEMARRAGE, avantages: (v.avantages || "").trim(),
+    teletravail: v.teletravail === "oui" ? "Oui" : v.teletravail === "non" ? "Non" : "Sous conditions", teletravail_conditions: v.teletravail === "conditions" ? v.conditions.trim() : "", fiche: v.fiche.trim(), echeance: echeance72()};
+  let m = mailOffre(o, c, d, v.recruteur_email), el = $("#modale"), s = ST.dec[kd(o, c)];
+  el.innerHTML = `<div class="fond"><div class="modale"><h2 style="font-size:22px">Aperçu de l'e-mail d'offre au candidat</h2><p class="meta">Voici l'e-mail qui sera adressé au candidat. Une fois confirmé, il est envoyé depuis l'adresse de l'équipe de recrutement Diaspora Connect, et vous êtes en copie. Le candidat dispose de 72 heures pour répondre ; la date limite exacte est calculée à l'envoi.</p>
+   <div class="mail"><div class="ent"><div><b>De :</b> ${esc(m.de)}</div><div><b>À :</b> ${esc(m.a)}</div><div><b>Copie :</b> ${esc(m.cc)}</div><div><b>Objet :</b> ${esc(m.objet)}</div></div><div class="corps">${m.corps}</div></div>
+   <div style="display:flex;gap:10px;justify-content:flex-end"><button id="o-non">Modifier</button><button class="prim" id="o-oui">Confirmer et envoyer l'offre</button></div></div></div>`;
+  $("#o-non").onclick = () => formulaireOffre(o, c);
+  $("#o-oui").onclick = async () => {
+    $("#o-oui").disabled = true;
+    d.echeance = echeance72(); m = mailOffre(o, c, d, v.recruteur_email);
+    const r = await envoyer("offre", {offre: o.id, candidat: c.id, objet: m.objet, detail: d, mail: {de: m.de, a: m.a, cc: m.cc, objet: m.objet, corps: m.corps}});
+    if (r && r.ok === false) return;
+    s.offre = {quand: new Date().toISOString(), detail: d}; delete s.offre_brouillon; sauver(); el.hidden = true; rendre();
+  };
+}
 /* ---------- interactions ---------- */
 function brancher(o, top) {
   document.querySelectorAll("details[data-dos]").forEach(d => d.addEventListener("toggle", () => { if (d.open) d.querySelectorAll("iframe[data-src]").forEach(f => { f.src = f.dataset.src; f.removeAttribute("data-src"); }); }));
   const parId = Object.fromEntries(o.candidats.map(c => [c.id, c]));
   const tous = (sel, f) => document.querySelectorAll(sel).forEach(f);
   if ($("#aj-manuel")) $("#aj-manuel").onclick = () => ajouterManuel(D, o.id);
+  if ($("#faire-offre")) $("#faire-offre").onclick = () => choisirCandidatOffre(o, top);
   tous("[data-acc]", b => b.onclick = () => { ST.dec[kd(o, parId[b.dataset.acc])] = {d: "accepte", plan: {}, quand: new Date().toISOString()}; sauver(); envoyer("decision", {offre: o.id, candidat: b.dataset.acc, decision: "accepte"}); rendre(); });
   tous("[data-ref]", b => b.onclick = () => formulaireRefus(o, parId[b.dataset.ref]));
   tous("[data-annuler]", b => b.onclick = () => { delete ST.dec[kd(o, parId[b.dataset.annuler])]; sauver(); envoyer("decision", {offre: o.id, candidat: b.dataset.annuler, decision: "annulee"}); rendre(); });
@@ -553,9 +652,11 @@ function journalHtml(L) {
     const txt = e.action === "decision" ? (e.decision === "accepte" ? `${qui} a accepté ${cand} (${poste})` : e.decision === "refus" ? `${qui} a refusé ${cand} (${poste}). Motif : ${esc(e.motif || "")}` : `${qui} a annulé sa décision pour ${cand} (${poste})`)
       : e.action === "email" ? `${qui} : e-mail d'entretien confirmé pour ${cand} (${poste}), ${esc(LIB[e.mode] || e.mode)}. À envoyer au candidat`
       : e.action === "business_case" ? `${qui} : business case à envoyer à ${cand} (${poste}), ${e.restitution && e.restitution.mode === "oral" ? "restitution orale lors de l'entretien" : "restitution par e-mail"}. À envoyer au candidat`
+      : e.action === "offre" ? `${qui} : offre d'emploi faite à ${cand} (${poste}), ${esc((e.detail || {}).contrat || "")}, salaire ${esc((e.detail || {}).salaire || "")}. À traiter par l'équipe`
       : e.action === "top3" ? `${qui} a classé son top 3 pour ${poste} : ` + (e.classement || []).map((id, i) => { const x = o && o.candidats.find(y => y.id === id); return x ? `${i + 1}. ${esc(x.prenom)} ${esc(x.nom)}` : ""; }).filter(Boolean).join(", ") : esc(e.action);
     const mailv = (e.action === "email" || e.action === "business_case") && e.mail ? `<details style="margin-top:6px"><summary>Voir l'e-mail à envoyer</summary><div class="meta" style="white-space:pre-line;margin-top:6px"><b>De :</b> ${esc(e.mail.de)}\n<b>À :</b> ${esc(e.mail.a)}${e.mail.cc ? "\n<b>Copie :</b> " + esc(e.mail.cc) : ""}\n<b>Objet :</b> ${esc(e.mail.objet)}\n\n${esc(String(e.mail.corps || "").replace(/<br\s*\/?>|<\/p>/gi, "\n").replace(/<[^>]+>/g, ""))}</div>${e.fichier && e.fichier.b64 ? `<div style="margin-top:6px"><a class="btn" download="${esc(e.fichier.nom)}" href="data:${esc(e.fichier.type || "application/octet-stream")};base64,${esc(e.fichier.b64)}">Télécharger la pièce jointe : ${esc(e.fichier.nom)}</a></div>` : ""}</details>` : "";
-    return `<div class="jr"><time>${e.quand === "9999" ? "récent" : FR(e.quand)}</time><div>${txt}${mailv}</div></div>`; }).join("");
+    const offv = e.action === "offre" && e.detail ? `<details style="margin-top:6px"><summary>Voir l'offre</summary><div class="meta" style="white-space:pre-line;margin-top:6px">${esc(texteOffre(e.detail))}</div></details>` : "";
+    return `<div class="jr"><time>${e.quand === "9999" ? "récent" : FR(e.quand)}</time><div>${txt}${mailv}${offv}</div></div>`; }).join("");
 }
 function exporterCsv(lignes) {
   const S = etatEquipe(), q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
@@ -594,4 +695,4 @@ function ajouterManuel(e, offreId) {
       o.candidats.push(Object.assign({}, c, {manuel: true, reserve: false, origine: "equipe"})); envoyer("ajout", {entreprise: e.id, offre: offreId, candidat: c.id}); m.hidden = true; D.equipe ? rendreEquipe() : rendre(); }); };
   $("#aj-q").oninput = liste; liste(); $("#aj-x").onclick = () => { m.hidden = true; };
 }
-</script><script src="extensions.js"></script></body></html>
+</script></body></html>
